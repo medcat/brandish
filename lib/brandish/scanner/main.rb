@@ -15,7 +15,7 @@ module Brandish
           fail # unreachable
       end
 
-      OPERATORS = %w({ } :).sort_by(&:size).reverse.freeze
+      OPERATORS = %w({ } : = .).sort_by(&:size).reverse.freeze
 
       def scan_escape
         match(/\\./, :ESCAPE)
@@ -35,7 +35,7 @@ module Brandish
           @line += 1
           @last_line_at = @scanner.charpos - 1
           emit(:LINE)
-        elsif @scanner.scan(/[ \v\t\f]/)
+        elsif @scanner.scan(/[ \v\t\f]+/)
           emit(:SPACE)
         end
       end

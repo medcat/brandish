@@ -82,8 +82,8 @@ module Brandish
       # @param tokens [<::Symbol>] The expected tokens.
       # @return [void]
       def error(tokens)
-        @file.unit.emit("unexpected-token", peek.location,
-          [peek.type.inspect, Array(tokens).flatten.map(&:inspect).join(", ")])
+        fail "Unexpected #{peek.type.inspect}, expected one of" \
+          " #{tokens.map(&:inspect).join(', ')}"
       end
     end
   end
