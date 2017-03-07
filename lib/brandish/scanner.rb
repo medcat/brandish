@@ -1,3 +1,4 @@
+# encoding: utf-8
 # frozen_string_literal: true
 
 require "strscan"
@@ -13,17 +14,19 @@ module Brandish
   class Scanner
     include Scanner::Main
 
+    DEFAULT_OPTIONS = { tags: %i(< >).freeze }.freeze
+
     # Initialize the scanner with the given source and file.  If no file
     # is given, it defaults to `<anon>`.
     #
     # @param source [::String] The source to read from.
     # @param file [::String] The name of the file that this originates from.
     #   See {Location#file}.
-    def initialize(source, file = "<anon>")
+    def initialize(source, file = "<anon>", **options)
       @scanner = StringScanner.new(source)
       @file = file
-      @line = 1
-      @last_line_at = 0
+      @options = DEFAULT_OPTIONS.merge(options)
+      reset!
     end
 
     # @overload call(&block)
@@ -44,11 +47,17 @@ module Brandish
       end
 
       yield Token.eof(location)
-      @scanner.reset
+      reset!
       self
     end
 
   private
+
+    def reset!
+      @scanner.reset
+      @line = 1
+      @last_line_at = 0
+    end
 
     def location(size = 0)
       start = @scanner.charpos - @last_line_at
@@ -61,8 +70,7 @@ module Brandish
     end
 
     def match(string, name = :"#{string}")
-      string = /#{::Regexp.escape(string.to_s)}/ if string.is_a?(::String)
-
+      string = ::Regexp.new(::Regexp.escape(string)) if string.is_a?(::Symbol)
       emit(name) if @scanner.scan(string)
     end
   end

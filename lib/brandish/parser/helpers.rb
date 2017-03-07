@@ -1,30 +1,20 @@
+# encoding: utf-8
+# frozen_string_literal: true
 
 module Brandish
   class Parser
+    # Helpers for the parser class.  This is used to help with the parsing
+    # process.  None of these should be used publicly.
     module Helpers
-      # Peeks to the next token.  If peeking would cause a `StopIteration`
-      # error, it instead returns the last value that was peeked.
+      # Peeks to the next token.
       #
       # @return [Scanner::Token]
       def peek
-        if next?
-          @_last = @enum.peek
-        else
-          @_last
-        end
+        @tokens.peek
       end
 
-      # Checks if the next token exists.  It does this by checking for a
-      # `StopIteration` error.  This is actually really slow, but there's
-      # not much else I can do.
-      #
-      # @return [::Boolean]
-      def next?
-        @enum.peek
-        true
-      rescue StopIteration
-        false
-      end
+      # rubocop:disable Metrics/CyclomaticComplexity
+      # rubocop:disable Metrics/PerceivedComplexity
 
       # "Collects" a set of nodes until a terminating token.  It yields
       # until the peek is the token.
@@ -48,19 +38,22 @@ module Brandish
         children
       end
 
-      # Checks to see if any of the given types includes the next token.
+      # rubocop:enable Metrics/CyclomaticComplexity
+      # rubocop:enable Metrics/PerceivedComplexity
+
+      # Checks to see if any of the given kinds includes the next token.
       #
-      # @param tokens [<::Symbol>] The possible types.
+      # @param tokens [<::Symbol>] The possible kinds.
       # @return [::Boolean]
-      def peek?(*tokens)
-        tokens.include?(peek.type)
+      def peek?(tokens)
+        tokens.include?(peek.kind)
       end
 
       # Shifts to the next token, and returns the old token.
       #
       # @return [Scanner::Token]
       def shift
-        @enum.next
+        @tokens.next
       end
 
       # Sets up an expectation for a given token.  If the next token is
@@ -69,21 +62,20 @@ module Brandish
       #
       # @param tokens [<::Symbol>] The expected tokens.
       # @return [Scanner::Token]
-      def expect(*tokens)
-        return shift if peek?(*tokens)
+      def expect(tokens)
+        return shift if peek?(tokens)
         error(tokens)
       end
 
       # Errors, noting the expected tokens, the given token, the location
-      # of given tokens.  It does this by emitting a diagnostic.  The
-      # diagnostic is only allowed to be a {Metanostic::Mode::PANIC}
-      # diagnostic, so this is garenteed to error.
+      # of given tokens.
       #
       # @param tokens [<::Symbol>] The expected tokens.
       # @return [void]
       def error(tokens)
-        fail "Unexpected #{peek.type.inspect}, expected one of" \
-          " #{tokens.map(&:inspect).join(', ')}"
+        fail ParseError.new("Unexpected #{peek.kind.inspect}, expected one of" \
+          " #{tokens.map(&:inspect).join(', ')} at #{peek.location}",
+          peek.location)
       end
     end
   end

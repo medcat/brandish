@@ -1,6 +1,8 @@
 AllCops:
   TargetRubyVersion: 2.3
 
+Metrics/LineLength:
+  Enabled: false
 Metrics/MethodLength:
   Max: 15
 Metrics/BlockLength:
@@ -20,6 +22,7 @@ Style/Documentation:
   Enabled: false
 Style/Encoding:
   Enabled: true
+  EnforcedStyle: always
   AutoCorrectEncodingComment: "# encoding: utf-8\n"
 Style/RegexpLiteral:
   EnforcedStyle: mixed
@@ -33,3 +36,7 @@ Style/IndentArray:
   Enabled: false
 Style/Alias:
   EnforcedStyle: prefer_alias_method
+Style/RaiseArgs:
+  EnforcedStyle: compact
+Style/ParallelAssignment:
+  Enabled: false

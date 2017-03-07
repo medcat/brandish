@@ -1,0 +1,14 @@
+# encoding: utf-8
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+# For edge:
+# gem "brandish", github: "medcat/brandish", branch: "master"
+# For the latest version:
+# gem "brandish"
+# For the running version:
+gem "brandish", "<%= approx %>"
+
+# Markdown support.
+gem "kramdown"

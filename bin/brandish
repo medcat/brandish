@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+# frozen_string_literal: true
+
+load_path = File.expand_path(File.join(__FILE__, "../../lib"))
+$LOAD_PATH.unshift(load_path) unless $LOAD_PATH.include?(load_path)
+require "brandish"
+require "brandish/application"
+
+Brandish::Application.call

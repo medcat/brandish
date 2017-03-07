@@ -1,0 +1,48 @@
+# encoding: utf-8
+# frozen_string_literal: true
+
+Brandish.configure do |config|
+  # Requires a certain version of Brandish.  This follows the gem requirement
+  # syntax.
+  config.version "<%= approx %>"
+
+  # Sets the root of the brandish documents and output.  This is a path to
+  # where the documents are located.
+  config.root "."
+
+  # Sets the brackets to be used for Brandish documents.  By default, they are
+  # the less than and greater than signs, but could be anything, as long as
+  # they are two distinct symbols.
+  # config.set :tags, %i([ ])
+
+  # A "form".  This is a form of output.  Multiple forms are allowed, with
+  # the same formats for each also allowed.
+  config.form :html, <%= :"#{options[:name]}_html".inspect %> do |form|
+    # `.use` adds a processor to the compilation chain for the document.
+    # Each processor updates the AST, changing something about it.  The
+    # `all:literal` processor provides the `<literal>` block tag for Brandish.
+    # All processors are scoped by a format; if no format is provided, the
+    # format for the form is assumed by default.
+    form.use "all:literal"
+    # `markup` allows the raw text in a document to be parsed as a given
+    # markup.
+    form.use :markup, engine: :kramdown
+    # `header` provides the `<header />` command tag for Brandish.
+    form.use :header
+    # This performs error checking of the document, to make sure that no tags
+    # in the documents are left over.
+    form.use "all:verify"
+    # `output` outputs the document in the given format.  This should always
+    # be last.
+    form.use :output
+  end
+
+  # The latex output of the brandish document.
+  # config.form :latex, <%= :"#{options[:name]}_latex".inspect %> do |form|
+  #  form.use "all:literal"
+  #  form.use :markup, engine: :kramdown
+  #  form.use :header
+  #  form.use "all:verify"
+  #  form.use :output
+  # end
+end

@@ -1,6 +1,8 @@
+# encoding: utf-8
 # frozen_string_literal: true
+
 require "simplecov"
-SimpleCov.start
+SimpleCov.start { filter "/spec/" }
 require "brandish"
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration

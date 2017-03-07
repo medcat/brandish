@@ -1,3 +1,4 @@
+# encoding: utf-8
 # frozen_string_literal: true
 
 module Brandish
@@ -12,17 +13,21 @@ module Brandish
           scan_numerics ||
           scan_whitespace ||
           scan_normal ||
-          fail # unreachable
+          fail(ScanError) # unreachable
       end
 
-      OPERATORS = %w({ } : = .).sort_by(&:size).reverse.freeze
+      OPERATORS = {
+        "=": :"=",
+        '"': :'"',
+        "/": :"/"
+      }.freeze
 
       def scan_escape
         match(/\\./, :ESCAPE)
       end
 
       def scan_operators
-        OPERATORS.find { |o| (t = match(o)) && (return t) }
+        operators.find { |(o, n)| (t = match(o, n)) && (return t) }
       end
 
       def scan_numerics
@@ -41,7 +46,12 @@ module Brandish
       end
 
       def scan_normal
-        match(/[^\d\r\n\v\t\f {}:\\]+/, :TEXT)
+        match(/[^\d\r\n\v\t\f #{Regexp.escape(operators.keys.join)}\\]+/, :TEXT)
+      end
+
+      def operators
+        @_operators ||=
+          OPERATORS.merge(@options.fetch(:tags).zip([:<, :>]).to_h)
       end
     end
   end

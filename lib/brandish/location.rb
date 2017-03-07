@@ -1,5 +1,6 @@
-
+# encoding: utf-8
 # frozen_string_literal: true
+
 module Brandish
   # A location in a file.  This can be used for debugging purposes.
   class Location
@@ -22,6 +23,23 @@ module Brandish
     # @return [::Range]
     attr_reader :column
 
+    # A "hash" of the location.  This is a number that is meant to roughly
+    # represent the value of this location.  Used primarily for the Hash
+    # class.
+    #
+    # @api private
+    # @return [::Numeric]
+    attr_reader :hash
+
+    # Creates a "default" location.  This is a location that can
+    # be given if the location is unknown.
+    #
+    # @param file [::String] The file.  See {#file}.
+    # @return [Location]
+    def self.default(file = "<unknown>")
+      new(file, 0..0, 0..0)
+    end
+
     # Initialize the location with the given information.
     #
     # @param file [::String] The file.  See {#file}.
@@ -31,6 +49,7 @@ module Brandish
       @file = file.freeze
       @line = ensure_range(line).freeze
       @column = ensure_range(column).freeze
+      @hash = [@file, @line, @column].hash
       freeze
     end
 
@@ -89,6 +108,10 @@ module Brandish
     #   a = Location.new("a", 1..5, 3..10)
     #   b = Location.new("b", 1..3, 2..20)
     #   a.union(b) # => #<Location file="a" line=1..5 column=2..20>
+    # @example
+    #   a # => #<Location ...>
+    #   b # => #<Location ...>
+    #   a.union(b) == b.union(a)
     #
     # @raise [::ArgumentError] if other isn't a {Location}.
     # @raise [::ArgumentError] if other's file isn't the receiver's file.
@@ -96,9 +119,9 @@ module Brandish
     # @return [Location]
     def union(*others)
       others.each do |other|
-        fail ::ArgumentError, "Expected #{self.class}, got #{other.class}" \
+        fail ArgumentError.new("Expected #{self.class}, got #{other.class}") \
           unless other.is_a?(Location)
-        fail ::ArgumentError, "Expected other to have the same file" unless
+        fail ArgumentError.new("Expected other to have the same file") unless
           file == other.file
       end
 
@@ -126,7 +149,7 @@ module Brandish
       when ::Range
         value
       else
-        fail ::ArgumentError, "Unexpected #{value.class}, expected Range"
+        fail ArgumentError.new("Unexpected #{value.class}, expected Range")
       end
     end
 

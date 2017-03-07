@@ -1,0 +1,3 @@
+<header value="<%= options[:name] %>" level=1 />
+
+Hello, world!
