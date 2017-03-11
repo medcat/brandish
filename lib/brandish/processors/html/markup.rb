@@ -66,6 +66,7 @@ module Brandish
         engine(:rdiscount, [:smart], :initialize_rdiscount, :markup_rdiscount)
         engine(:minidown, {}, :initialize_minidown, :markup_minidown)
         engine(:redcloth, [], :initialize_redcloth, :markup_redcloth)
+        engine(:redcarpet, {}, :initialize_redcarpet, :markup_redcarpet)
         engine(:creole, { extensions: true }, :initialize_creole, :markup_creole)
         engine(:sanitize, :relaxed, :initialize_sanitize, :markup_sanitize)
         engine(:escape, nil, nil, :markup_escape)
@@ -103,6 +104,15 @@ module Brandish
 
         def markup_redcloth(value, options)
           RedCloth.new(value, options).to_html
+        end
+
+        def initialize_redcarpet
+          require "redcarpet"
+          @format = Markup::Redcarpet::Format.new(@context, engine_options)
+        end
+
+        def markup_redcarpet(value, _options)
+          @format.render(value)
         end
 
         def initialize_creole
