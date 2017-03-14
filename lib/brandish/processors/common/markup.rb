@@ -82,7 +82,7 @@ module Brandish
           when ::Proc   then @engine[1].call
           when nil      then return
           else
-            fail ProcessorError.new("Unknown initializer `#{@engine[1].inspect}`")
+            fail ProcessorError, "Unknown initializer `#{@engine[1].inspect}`"
           end
         end
 
@@ -95,12 +95,12 @@ module Brandish
           when ::Proc
             [{}, nil, engine]
           else
-            fail ProcessorError.new("Unknown engine `#{engine.inspect}`")
+            fail ProcessorError, "Unknown engine `#{engine.inspect}`"
           end
         end
 
         def engine_options
-          @options ||= @options.fetch(:options) { @engine[0].dup }.freeze
+          @_engine_options ||= _build_engine_options
         end
 
         def markup(value)
@@ -108,8 +108,18 @@ module Brandish
           when ::Symbol then send(@engine[2], value, engine_options)
           when ::Proc   then @engine[2].call(value, engine_options)
           else
-            fail ProcessorError.new("Unknown processor `#{@engine[2].inspect}`")
+            fail ProcessorError, "Unknown processor `#{@engine[2].inspect}`"
           end
+        end
+
+      private
+
+        def _build_engine_options
+          if @engine[0].is_a?(::Hash)
+            @engine[0].merge(@options.fetch(:options, {}))
+          else
+            @options.fetch(:options) { @engine[0].dup }
+          end.freeze
         end
       end
     end

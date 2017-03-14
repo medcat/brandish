@@ -28,14 +28,15 @@ module Brandish
         #
         # @param name [Scanner::Token] The name of the block.
         # @param body [Node::Root] The body of the block.
+
         # @param location [Location] The location of the block.
         def initialize(name:, body:, arguments: nil, pairs: nil, location: nil)
           if !location && !arguments
-            fail ArgumentError.new("Expected either a location or " \
-              "arguments, got neither")
+            fail ArgumentError, "Expected either a location or " \
+              "arguments, got neither"
           end
 
-          @name = name.is_a?(Scanner::Token) ? name.value : name
+          @name = name.is_a?(Yoga::Token) ? name.value : name
           @body = body
           @location = location || arguments.map(&:location)
                                            .inject(name.location.union(body.location),

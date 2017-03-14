@@ -4,6 +4,7 @@
 require "brandish/processors/html/header"
 require "brandish/processors/html/markup"
 require "brandish/processors/html/output"
+require "brandish/processors/html/style"
 
 module Brandish
   module Processors

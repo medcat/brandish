@@ -25,9 +25,10 @@ module Brandish
     attr_reader :location
 
     # Initialize the error with the given location and message.
-    def initialize(message, location = Location.default)
+    def initialize(message, location = Location.default, bt = caller[1..-1])
       @location = location
       super(message)
+      set_backtrace(bt)
     end
   end
 

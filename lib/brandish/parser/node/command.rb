@@ -42,11 +42,11 @@ module Brandish
         #   @param location [Location] The location of the node.
         def initialize(name:, arguments: nil, pairs: nil, location: nil)
           if !location && !arguments
-            fail ArgumentError.new("Expected either a location or " \
-              "arguments, got neither")
+            fail ArgumentError, "Expected either a location or " \
+              "arguments, got neither"
           end
 
-          @name = name.is_a?(Scanner::Token) ? name.value : name.freeze
+          @name = name.is_a?(Yoga::Token) ? name.value : name.freeze
           @location = location || arguments.map(&:location)
                                            .inject(name.location, :union)
           @pairs = pairs.freeze || derive_pairs(arguments).freeze

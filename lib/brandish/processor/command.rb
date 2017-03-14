@@ -7,13 +7,14 @@ module Brandish
     # one specific command.  The command name itself is specified on the
     # class, and the class provides logic to only modify command nodes with
     # the same name.
-    #
-    # @abstract
-    #   This class is not designed to be used and instantiated directly; this
-    #   just provides common behavior for a processor.  This class should be
-    #   subclassed and proper behavior defined on a subclass.
-    class Command < Base
-      include Processor::NameFilter
+    module Command
+      # Ruby hook.
+      #
+      # @api private
+      # @return [void]
+      def self.included(base)
+        base.include Processor::NameFilter
+      end
 
       # Processes the command.  If the node's name doesn't match the name for
       # this class, it passes it on up to {Base#process_command}; otherwise,
@@ -23,18 +24,20 @@ module Brandish
       # @return [::Object]
       def process_command(node)
         return super unless allowed_names.include?(node.name)
-        @options = node.pairs
-        perform(node)
+        @node = node
+        @name = node.name
+        @pairs = node.pairs
+        @body = nil
+        perform
       end
 
       # Performs the command adjustment.  This must be subclassed and
       # overwritten.
       #
       # @abstract
-      # @param _node [Parser::Node::Command]
       # @return [::Object]
-      def perform(_node)
-        fail NotImplementedError.new("Please implement #{self.class}#perform")
+      def perform
+        fail NotImplementedError, "Please implement #{self.class}#perform"
       end
     end
   end

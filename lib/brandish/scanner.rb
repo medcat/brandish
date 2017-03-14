@@ -2,18 +2,18 @@
 # frozen_string_literal: true
 
 require "strscan"
-require "brandish/scanner/main"
-require "brandish/scanner/token"
+require "yoga"
 
 module Brandish
   # Scans the file for tokens.  This is by default done incrementally, as it's
   # requested by the parser or whatever consumer wants to use it.  This is done
-  # to make sure that work that doesn't need to be done isn't.  Most of the
-  # logic for scanning is located in {Scanner::Main} - this class mostly
-  # contains the helpers for the scanner.
+  # to make sure that work that doesn't need to be done isn't.
   class Scanner
-    include Scanner::Main
+    include Yoga::Scanner
 
+    # The default options for the scanner.
+    #
+    # @return [{::Symbol => ::Object}]
     DEFAULT_OPTIONS = { tags: %i(< >).freeze }.freeze
 
     # Initialize the scanner with the given source and file.  If no file
@@ -21,57 +21,47 @@ module Brandish
     #
     # @param source [::String] The source to read from.
     # @param file [::String] The name of the file that this originates from.
-    #   See {Location#file}.
-    def initialize(source, file = "<anon>", **options)
-      @scanner = StringScanner.new(source)
-      @file = file
+    def initialize(*args, **options)
+      super(*args)
       @options = DEFAULT_OPTIONS.merge(options)
-      reset!
-    end
-
-    # @overload call(&block)
-    #   For every token that is scanned, the block is yielded to.
-    #
-    #   @yieldparam token [Scanner::Token]
-    #   @return [self]
-    # @overload call
-    #   Returns an enumerable over the tokens in the scanner.
-    #
-    #   @return [::Enumerable<Scanner::Token>]
-    def call
-      return to_enum(:call) unless block_given?
-
-      until @scanner.eos?
-        value = scan
-        yield value if value.is_a?(Token)
-      end
-
-      yield Token.eof(location)
-      reset!
-      self
     end
 
   private
 
-    def reset!
-      @scanner.reset
-      @line = 1
-      @last_line_at = 0
+    def scan
+      scan_escape ||
+        scan_operators ||
+        scan_numerics ||
+        scan_whitespace ||
+        scan_normal ||
+        fail(ScanError) # unreachable
     end
 
-    def location(size = 0)
-      start = @scanner.charpos - @last_line_at
-      column = (start - size)..start
-      Location.new(@file, @line, column)
+    def scan_escape
+      match(/\\./, :ESCAPE)
     end
 
-    def emit(name, source = @scanner[0])
-      Token.new(name, source, location(source.length))
+    def scan_operators
+      operators.find { |(o, n)| (t = match(o, n)) && (return t) }
     end
 
-    def match(string, name = :"#{string}")
-      string = ::Regexp.new(::Regexp.escape(string)) if string.is_a?(::Symbol)
-      emit(name) if @scanner.scan(string)
+    def scan_numerics
+      match(/0[xX][0-9a-fA-F]/, :NUMERIC) || match(/[-+]?\d+(\.\d+)?/, :NUMERIC)
+    end
+
+    def scan_whitespace
+      match_line(:LINE) || match(/[ \v\t\f]+/, :SPACE)
+    end
+
+    def scan_normal
+      match(/[^\d\s\\#{Regexp.escape(operators.keys.join)}]+/, :TEXT)
+    end
+
+    OPERATORS = { "=" => :"=", '"' => :'"', "/" => :"/" }.freeze
+
+    def operators
+      @_operators ||=
+        OPERATORS.merge(@options.fetch(:tags).map(&:to_s).zip([:<, :>]).to_h)
     end
   end
 end

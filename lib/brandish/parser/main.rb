@@ -17,6 +17,8 @@ module Brandish
         Node::Root.new(children: body)
       end
 
+      alias_method :parse_root, :parse_document
+
       # Parses a single element in the docuemnt.  If the next token is a
       # less-than sign, it calls {#parse_document_meta}; otherwise, it calls
       # {#parse_document_text}.
@@ -131,7 +133,7 @@ module Brandish
 
         Node::Block.new(name: name, body: body, arguments: arguments,
           location: start.location.union(body.location, match.location,
-          stop.location, *arguments.map(&:location)))
+            stop.location, *arguments.map(&:location)))
       end
 
       # Parses the body of a block tag.  This keeps attempting to parse text
@@ -168,13 +170,13 @@ module Brandish
         stop = expect([:'"'])
         location = start.location.union(stop.location)
 
-        Node::String.new(children: children, location: location)
+        Node::String.new(tokens: children, location: location)
       end
 
       # Parses a document for text.  This is just regular text tokens.  For a
       # list of tokens that are allowed, see {Node::Text::TOKENS}.
       #
-      #     text ::= *(TEXT / SPACE / LINE / NUMERIC / ESCAPE / '@' / '"' / '=')
+      #     text ::= *(TEXT / SPACE / LINE / NUMERIC / ESCAPE / '/' / '"' / '=')
       #
       # @return [Node::Text]
       def parse_document_text

@@ -14,7 +14,7 @@ module Brandish
 
         def header_render
           html.tag(TAGS.fetch(header_level), header_value, id: header_id,
-            class: @options.fetch("class", ""))
+            class: @pairs.fetch("class", ""))
         end
       end
     end

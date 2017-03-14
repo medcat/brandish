@@ -3,48 +3,26 @@
 
 module Brandish
   class Configure
-    class Form
-      attr_reader :processors
-      attr_reader :format
-      attr_accessor :name
-      attr_writer :entry
+    # A form used for building.
+    Form = Struct.new(:name, :format, :entry, :processors) do
+      # Builds the form.  This takes a configure object, and builds the
+      # form based on that.
+      #
+      # @see Configure#roots
+      # @see Processor::Context
+      # @see Processor
+      # @param configure [Configure] The configuration object for this build.
+      # @return [void]
+      def build(configure)
+        context = Processor::Context.new(configure, self)
+        root = configure.roots[configure.source / entry]
 
-      def initialize(format, name = Configure.random_name)
-        @name = name.to_s
-        @format = format
-        @processors = []
-      end
-
-      def entry
-        @entry || "index.br"
-      end
-
-      def use(name, options = {})
-        format, processor =
-          case name
-          when ::String
-            name.split(":")
-          when ::Symbol
-            [@format, name]
-          when ::Array
-            name
-          else
-            fail ::ArgumentError.new("Unexpected `#{name.inspect}")
-          end.map(&:intern)
-
-        @processors << [format, processor, options]
-      end
-
-      def build(trees, options)
-        context = Processor::Context.new
-        root = trees[options[:root] / entry]
-
-        @processors.each do |processor|
-          klass = Processor.all.fetch([processor[0],processor[1]])
+        processors.each do |processor|
+          klass = Processor.all.fetch([processor[0], processor[1]])
           klass.new(context, processor[2])
         end
 
-        p context.accept(root)
+        context.process(root)
       end
     end
   end

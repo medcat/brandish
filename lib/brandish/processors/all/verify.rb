@@ -24,15 +24,14 @@ module Brandish
       private
 
         def error_message(node)
-          "Unexpected command or block element `#{node.name}` at " \
-            "#{node.location}.  All command and block elements should be " \
-            "processed; try adding #{suggested_processor(node)} to your " \
-            "`brandish.config.rb` file"
+          "Unexpected command or block element `#{node.name}' at " \
+            "#{node.location}; try adding #{suggested_processor(node)} to " \
+            "your `brandish.config.rb` file"
         end
 
         def suggested_processor(node)
           "`form.use #{node.name.intern.inspect}` or " \
-            "`form.use \"all:#{node.name}\"`"
+            "`form.use #{"all:#{node.name}".inspect}`"
         end
       end
     end

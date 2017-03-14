@@ -11,4 +11,4 @@ source "https://rubygems.org"
 gem "brandish", "<%= approx %>"
 
 # Markdown support.
-gem "kramdown"
+gem "redcarpet"

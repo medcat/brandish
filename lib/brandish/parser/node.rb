@@ -5,8 +5,8 @@ require "brandish/parser/node/block"
 require "brandish/parser/node/command"
 require "brandish/parser/node/pair"
 require "brandish/parser/node/root"
-require "brandish/parser/node/string"
 require "brandish/parser/node/text"
+require "brandish/parser/node/string"
 
 module Brandish
   class Parser

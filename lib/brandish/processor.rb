@@ -38,7 +38,7 @@ module Brandish
     def self.register(map)
       map.each do |(format, name), processor|
         format, name = format.intern, name.intern
-        fail ProcessorError.new("#{format}:#{name} already exists") \
+        fail ProcessorError, "#{format}:#{name} already exists" \
           if all.key?([format, name])
         all[[format, name]] = processor
       end

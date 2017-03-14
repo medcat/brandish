@@ -7,8 +7,7 @@ module Brandish
       # A key-value pair used for a command.  This is used to represent an
       # argument for the command node.
       class Pair < Node
-        # The key of the pair.  This will *always* be a `:TEXT`
-        # {Scanner::Token}.
+        # The key of the pair.  This will *always* be a `:TEXT`.
         #
         # @return [Scanner::Token] The key.
         attr_reader :key
@@ -20,7 +19,7 @@ module Brandish
 
         # Initialize the pair node with the given key, value and location.
         #
-        # @param key [Scanner::Token] The key.
+        # @param key [Yoga::Token] The key.
         # @param value [Parser::Node::Text, Parser::Node::String] The value.
         # @param location [Location] The location of the key-value pair.
         def initialize(key:, value:, location: nil)

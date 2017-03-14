@@ -36,7 +36,5 @@ Style/IndentArray:
   Enabled: false
 Style/Alias:
   EnforcedStyle: prefer_alias_method
-Style/RaiseArgs:
-  EnforcedStyle: compact
 Style/ParallelAssignment:
   Enabled: false

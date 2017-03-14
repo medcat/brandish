@@ -52,21 +52,22 @@ module Brandish
       # @param node [Parser::Node] A parser node to handle.
       # @return [Parser::Node, nil] The result of processing.
       def call(node)
-        result = case node
-                 when Parser::Node::Block   then process_block(node)
-                 when Parser::Node::Command then process_command(node)
-                 when Parser::Node::Root    then process_root(node)
-                 when Parser::Node::Text    then process_text(node)
-                 else
-                   fail ArgumentError.new("Expected node, got #{node.class}")
-                 end
+        result = _switch_node(node)
+
+        _fix_result(result)
 
         if result.is_a?(Parser::Node)
           result
-        else
-          Parser::Node::Text.new(value: result, location: node.location).
-            prevent_update
+        elsif result.is_a?(::String)
+          Parser::Node::Text.new(value: result, location: node.location)
+                            .prevent_update
+        elsif result
+
         end
+      rescue LocationError then fail
+      rescue => e
+        fail BuildError.new("#{e.class}: #{e.message} at #{node.location}",
+          node.location, e.backtrace)
       end
 
       # (see Context#accept)
@@ -108,6 +109,36 @@ module Brandish
       # @return [::Object]
       def process_text(node)
         node
+      end
+
+      # An optional post-process.
+      #
+      # @return [void]
+      def postprocess; end
+
+    private
+
+      def _switch_node(node)
+        case node
+        when Parser::Node::Block   then process_block(node)
+        when Parser::Node::Command then process_command(node)
+        when Parser::Node::Root    then process_root(node)
+        when Parser::Node::Text    then process_text(node)
+        else
+          fail ArgumentError, "Expected node, got #{node.class}"
+        end
+      end
+
+      def _fix_result(result)
+        case result
+        when Parser::Node, nil then result
+        when ::String
+          Parser::Node::Text.new(value: result, location: node.location)
+                            .prevent_update
+        else
+          fail ArgumentError, "Unknown result type `#{result.class}` " \
+            "(given from #{self.class})"
+        end
       end
     end
   end

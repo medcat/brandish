@@ -1,6 +1,9 @@
 # encoding: utf-8
 # frozen_string_literal: true
 
+require "brandish/processors/all/embed"
+require "brandish/processors/all/if"
+require "brandish/processors/all/import"
 require "brandish/processors/all/literal"
 require "brandish/processors/all/verify"
 

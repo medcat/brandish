@@ -10,12 +10,12 @@ module Brandish
       # decendants.  This node automatically merges the contents of the text
       # into a single value, and places it in the `value` attribute.
       class Text < Node
-        # A set of {Scanner::Token} tokens kinds that are allowed to be in a
-        # text node.
+        # A set of tokens kinds that are allowed to be in a text node.
         #
         # @return [Set<::Symbol>]
         TOKENS =
-          Set[:SPACE, :TEXT, :LINE, :NUMERIC, :ESCAPE, :'"', :"="].freeze
+          Set[:SPACE, :TEXT, :LINE, :NUMERIC, :ESCAPE, :'"', :"=", :"/"].freeze
+
         # The value of the text node.  This is the string value of the source
         # text that this node is based off of.
         #
@@ -42,11 +42,10 @@ module Brandish
         #   @param location [Location] The location of the text node.
         def initialize(tokens: nil, value: nil, location: nil)
           unless tokens || (value && location)
-            fail ::ArgumentError.new("Expected either a set of tokens or a " \
-              "value and a location, got neither")
+            fail ArgumentError, "Expected either a set of tokens or a " \
+              "value and a location, got neither"
           end
 
-          @_tokens = tokens
           @value = value || derive_value(tokens)
           @location = location || derive_location(tokens)
           freeze
@@ -68,7 +67,7 @@ module Brandish
         # @param other [::Object]
         # @return [Boolean]
         def ==(other)
-          equal?(other) || other.is_a?(Text) && @value == other.value &&
+          equal?(other) || other.is_a?(self.class) && @value == other.value &&
             @location == other.location
         end
 
@@ -79,7 +78,7 @@ module Brandish
         end
 
         def update_tokens(tokens)
-          update_value(assert_valid_tokens(tokens) && tokens.map(&:value).join)
+          update_value(derive_value(tokens))
         end
 
         def update_location(location)
@@ -88,22 +87,26 @@ module Brandish
 
         def derive_location(tokens)
           unless tokens
-            fail ::ArgumentError.new("Expected either location or tokens, got" \
-              " neither")
+            fail ArgumentError, "Expected either location or tokens, got" \
+              " neither"
           end
 
           tokens.map(&:location).inject(:union)
         end
 
         def derive_value(tokens)
-          (assert_valid_tokens(tokens) && tokens.map(&:value).join).freeze
+          assert_valid_tokens(tokens)
+          tokens
+            .map { |t| t.kind == :ESCAPE ? t.value[-1] : t.value }
+            .join
+            .freeze
         end
 
         def assert_valid_tokens(tokens)
           valid = tokens.all? { |t| TOKENS.include?(t.kind) }
           return valid if valid
-          fail ::ArgumentError.new("Expected tokens to all be one of " \
-            "#{TOKENS.map(&:inspect).join(', ')}")
+          fail ArgumentError, "Expected tokens to all be one of " \
+            "#{TOKENS.map(&:inspect).join(', ')}"
         end
       end
     end

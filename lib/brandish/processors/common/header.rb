@@ -9,7 +9,8 @@ module Brandish
       # possibly create a table of contents, if needed.
       #
       # @abstract
-      class Header < Processor::Command
+      class Header < Processor::Base
+        include Processor::Command
         self.name = :header
 
         # (see Processor::Command#initialize)
@@ -21,9 +22,8 @@ module Brandish
         # Handles the header.  This stores the {#header_data} in the context
         # `:headers` key, and then calls {#header_render}.
         #
-        # @param _node [Parser::Node::Command] The node.  Unused.
         # @return [Parser::Node::Text] The resulting header text.
-        def perform(_node)
+        def perform
           @context[:headers] << header_data
           header_render
         end
@@ -34,7 +34,7 @@ module Brandish
         # @abstract
         # @return [Parser::Node::Text] The resulting header text.
         def header_render
-          fail NotImplementedError.new("Please implement #{self.class}#header_render")
+          fail NotImplementedError, "Please implement #{self.class}#header_render"
         end
 
         # The header data used for the internal `:headers` structure.
@@ -48,7 +48,7 @@ module Brandish
         #
         # @return [Numeric]
         def header_level
-          @options.fetch("level", "1").to_i
+          @pairs.fetch("level", "1").to_i
         end
 
         # The "value" of the header.  This is the contents or the name of the
@@ -56,7 +56,7 @@ module Brandish
         #
         # @return [::String]
         def header_value
-          @options.fetch("value")
+          @pairs.fetch("value")
         end
 
         # The "id" of the header.  This should be a unique value between all
@@ -64,7 +64,7 @@ module Brandish
         #
         # @return [::String]
         def header_id
-          @options.fetch("id") { header_value.downcase.gsub(/[^\w]|\_/, "-") }
+          @pairs.fetch("id") { header_value.downcase.gsub(/[^\w]|\_/, "-") }
         end
       end
     end

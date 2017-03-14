@@ -91,19 +91,36 @@ module Brandish
       # @return [<#call>]
       attr_reader :processors
 
-      # The "buffer."  This is used by Brandish processors to generate an
-      # output.
+      # The configuration for the build.  This is used for output directories
+      # and the like.
       #
-      # @return [::Object]
-      attr_accessor :buffer
+      # @return [Configure]
+      attr_reader :configure
+
+      # The form that is being processed.
+      #
+      # @return [Configure::Form]
+      attr_reader :form
 
       # Initialize the context, to set up the internal state.
-      def initialize
+      def initialize(configure, form)
         @processors = []
+        @configure = configure
+        @form = form
         @descent = Processor::Descend.new(self)
         @visited = ::Set.new
         @buffer = []
         @options = {}
+      end
+
+      # Performs the processing of the given root node.  This should be a
+      # {Parser::Node::Root}.
+      #
+      # @param root [Parser::Node::Root]
+      # @return [::Object]
+      def process(root)
+        accept(root)
+        effective_processors.each(&:postprocess)
       end
 
       # Accepts a node.  This passes the node through all of the processors,
@@ -127,7 +144,7 @@ module Brandish
     private
 
       def effective_processors
-        @processors + [@descent]
+        [@descent] + @processors
       end
     end
   end

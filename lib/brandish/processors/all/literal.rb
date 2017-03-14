@@ -4,12 +4,13 @@
 module Brandish
   module Processors
     module All
-      class Literal < Processor::Block
-        name :literal, :raw
+      class Literal < Processor::Base
+        include Processor::Block
+        self.names = [:literal, :raw]
         register %i(all literal) => self
 
-        def perform(_)
-          @body.prevent_update
+        def perform
+          @body.flatten
         end
       end
     end

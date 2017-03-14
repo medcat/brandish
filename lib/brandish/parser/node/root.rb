@@ -22,7 +22,7 @@ module Brandish
           @children = children.freeze
           @location = location || (@assumed = true) &&
                                   (@children.map(&:location).inject(:union) ||
-                                  Location.default)
+                                  Yoga::Location.default)
           freeze
         end
 
@@ -46,12 +46,29 @@ module Brandish
             @location == other.location
         end
 
+        # This flattens out the root node into a single string value.  This is
+        # used for outputing the contents.
+        #
+        # @raise [NodeError] if the node contains a non-root or non-text node.
+        # @return [::String]
+        def flatten
+          children.map do |child|
+            case child
+            when Node::Root then child.flatten
+            when Node::Text then child.value
+            else
+              fail NodeError.new("Unexpected node `#{child.class}",
+                node.location)
+            end
+          end.join
+        end
+
       private
 
         def update_children(children)
           location = if @assumed
                        children.map(&:location).inject(:union) ||
-                         Location.default
+                         Yoga::Location.default
                      else
                        @location
                      end

@@ -44,6 +44,11 @@ module Brandish
       #   `:filter_styles`, `:filter_classes`, `:filter_ids`,
       #   `:hard_breaks` (deprecated, default), `:lite_mode`,
       #   and `:no_span_caps`.
+      # - `:redcarpet` - A Markdown formatter.  More information on this
+      #   markup format can be found at <https://github.com/vmg/redcarpet>.
+      #   This is the preferred format for Brandish due to its integration.
+      #   The options that are valid for this formatter can be found on
+      #   {Brandish::Markup::Redcarpet::Format}.
       # - `:creole` - A creole formatter.  More information on this markup
       #   format can be found at <https://github.com/larsch/creole>.
       #   Available options are: `:allowed_schemes`, `:extensions`,
@@ -56,6 +61,7 @@ module Brandish
       #   `:relaxed`, and `:basic`.
       # - `:escape` - Escapes the content to prevent conflict with the
       #   resulting format.
+      #
       # @note
       #   This class provides the `html:markup` processor.
       class Markup < Processors::Common::Markup
@@ -108,7 +114,8 @@ module Brandish
 
         def initialize_redcarpet
           require "redcarpet"
-          @format = Markup::Redcarpet::Format.new(@context, engine_options)
+          data = engine_options.merge(format: :html, context: @context)
+          @format = ::Brandish::Markup::Redcarpet::Format.new(data)
         end
 
         def markup_redcarpet(value, _options)
@@ -125,8 +132,10 @@ module Brandish
 
         def initialize_sanitize
           require "sanitize"
-          @options = Sanitize::Config.const_get(engine_options.to_s.upcase) if
-            engine_options.is_a?(::Symbol)
+          if engine_options.is_a?(::Symbol)
+            @_engine_options =
+              Sanitize::Config.const_get(engine_options.to_s.upcase)
+          end
         end
 
         def markup_sanitize(value, options)
