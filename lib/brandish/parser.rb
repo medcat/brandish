@@ -15,5 +15,12 @@ module Brandish
   class Parser
     include Yoga::Parser
     include Parser::Main
+
+    def initialize(*)
+      super
+    end
+
+    undef_method :peek_out
+    undef_method :peek_out?
   end
 end

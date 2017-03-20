@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>{{ title | escape }}</title>
+    <meta name="description" content="{{ description | escape }}">
+    <meta name="author" content="{{ author | escape }}">
+
+    {% for style in styles %}
+      {% if style.inline? %}
+        {% comment %}
+          Style and Script tags, in HTML5, are CDATA.  No escaping needed.
+        {% endcomment %}
+        <style>{{ style.content }}</style>
+      {% else %}
+        <link rel="stylesheet" href="{{ style.content | escape }}">
+      {% endif %}
+    {% endfor %}
+  </head>
+
+  <body>
+    <div id="container">
+      {{ content }}
+    </div>
+
+    {% for script in scripts %}
+      {% if script.inline? %}
+        {% comment %}
+          Style and Script tags, in HTML5, are CDATA.  No escaping needed.
+        {% endcomment %}
+        <script>{{ script.content }}</script>
+      {% else %}
+        <script src="{{ script.content | escape }}"></script>
+      {% endif %}
+    {% endfor %}
+  </body>
+</html>

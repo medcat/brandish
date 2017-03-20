@@ -1,7 +1,6 @@
 # encoding: utf-8
 # frozen_string_literal: true
 
-require "rubygems" # for Gem::Requirement
 require "pathname"
 require "brandish/configure/dsl/form"
 
@@ -69,27 +68,6 @@ module Brandish
       alias_method :root_path=, :root=
       alias_method :root_path, :root
 
-      # Sets the source directory of the Brandish project.  This is where all
-      # of the sources are located.  This is normally `"./source"`.
-      #
-      # @param source [::String, ::Pathname] The path to the source directory.
-      # @return [void]
-      def source=(source)
-        path = _expand_path(source, root)
-        self[:source] = source
-      end
-
-      # Retrives the source directory of the Brandish project.  This is where
-      # all of the sources are located.  This is normally `"./source"`.
-      #
-      # @return [::Pathname] The full path to the sources.
-      def source
-        self[:source]
-      end
-
-      alias_method :source_path=, :source=
-      alias_method :source_path, :source
-
       # Sets the output directory of the Brandish project.  This is where all
       # of the outputs are placed.  This is normally `"./output"`.
       #
@@ -111,19 +89,25 @@ module Brandish
       alias_method :output_path=, :output=
       alias_method :output_path, :output
 
-      def templates=(templates)
-        path = _expand_path(templates, root)
-        self[:templates] = path
+      # Retrives the source directories of the Brandish project.  This is where
+      # all of the sources are located.  This is normally `"./source"`.
+      #
+      # @return [::Pathname] The full path to the sources.
+      def sources
+        self[:sources]
       end
 
+      alias_method :source_paths, :sources
+
+      # Retrieves the template directory of the Brandish project.  This is
+      # where all of the templates are placed.  This is normally `"./template"`.
+      #
+      # @return [::Pathname] The full path to the template.
       def templates
         self[:templates]
       end
 
-      alias_method :templates_path=, :templates=
-      alias_method :templates_path, :templates
-      alias_method :template_path=, :templates=
-      alias_method :template_path, :templates
+      alias_method :template_paths, :templates
 
       # Creates a new form for the configuration object.  This takes arguments
       # and a block.  The block is yielded the form instance.
@@ -144,7 +128,7 @@ module Brandish
     private
 
       def _expand_path(path, directory)
-        ::Pathname.new(path).expand_path(::Pathname.new(directory)).realpath
+        ::Pathname.new(path).expand_path(::Pathname.new(directory))
       end
     end
   end

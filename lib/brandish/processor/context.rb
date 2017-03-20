@@ -14,6 +14,14 @@ module Brandish
     # processor, and distributes the processing management throughout all of
     # the processors.
     class Context
+      # A "skip" construct.  This makes the node be skipped through processing
+      # for the rest of the processors.  This is automatically applied to all
+      # nodes that are {Parser::Node#update_prevented?}.
+      #
+      # Once the skip construct has been passed through the processing, it is
+      # automatically unwrapped, returning the original node.
+      Skip = Struct.new(:node)
+
       extend Forwardable
       # @!method <<(*processors)
       #   Adds processors to the processor list.  This delegates to
@@ -72,7 +80,7 @@ module Brandish
       #     attempts to retrieve a value at the given key.  If there is no
       #     key-value pair at the given key, it yields.
       #
-      #     @yields if there is no corresponding key-value pair.
+      #     @yield if there is no corresponding key-value pair.
       #     @param key [::Symbol, ::String] The key.
       #     @return [::Object] The value, or the result of the block if there
       #       isn't one.
@@ -108,7 +116,6 @@ module Brandish
         @configure = configure
         @form = form
         @descent = Processor::Descend.new(self)
-        @visited = ::Set.new
         @buffer = []
         @options = {}
       end
@@ -119,8 +126,8 @@ module Brandish
       # @param root [Parser::Node::Root]
       # @return [::Object]
       def process(root)
-        accept(root)
-        effective_processors.each(&:postprocess)
+        root = accept(root)
+        effective_processors.each { |p| p.postprocess(root) }
       end
 
       # Accepts a node.  This passes the node through all of the processors,
@@ -129,19 +136,30 @@ module Brandish
       # @param node [Parser::Node] The node to process.
       # @return [::Object]
       def accept(node)
-        # FIXME: Temporary check to ensure that we never visit the same node
-        # twice.  This should only happen by default - if it is required by any
-        # custom processors, it should be allowed.  Therefore, this is only
-        # here for the core processors.
-        fail if @visited.include?(node)
-        @visited << node
         # Injects the node over all effective processors.  Every iteration will
         # use the value returned by the last `process` method call, unless it
         # is `nil`.
-        effective_processors.inject(node) { |n, p| p.call(n) if n }
+        result = effective_processors.inject(node) { |n, p| accept_node_with(n, p) }
+        result.is_a?(Skip) ? result.node : result
       end
 
     private
+
+      def accept_node_with(node, processor)
+        case node
+        when Skip, nil
+          node
+        when Parser::Node
+          result = processor.call(node)
+          if result.is_a?(Parser::Node) && result.update_prevented?
+            Skip.new(result)
+          else
+            result
+          end
+        else
+          fail ProcessorError, "Unknown node type `#{node.class}'"
+        end
+      end
 
       def effective_processors
         [@descent] + @processors

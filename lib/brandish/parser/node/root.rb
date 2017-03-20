@@ -20,9 +20,8 @@ module Brandish
         #   is provided, it assumed from the children.
         def initialize(children:, location: nil)
           @children = children.freeze
-          @location = location || (@assumed = true) &&
-                                  (@children.map(&:location).inject(:union) ||
-                                  Yoga::Location.default)
+          @location = location || derive_location(children)
+          fail unless children.any?
           freeze
         end
 
@@ -65,14 +64,14 @@ module Brandish
 
       private
 
+        def derive_location(children)
+          children.map(&:location).inject(:union) || Yoga::Location.default
+        rescue
+          Yoga::Location.default
+        end
+
         def update_children(children)
-          location = if @assumed
-                       children.map(&:location).inject(:union) ||
-                         Yoga::Location.default
-                     else
-                       @location
-                     end
-          Root.new(children: children, location: location)
+          Root.new(children: children, location: @location)
         end
 
         def update_location(location)

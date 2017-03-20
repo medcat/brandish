@@ -4,16 +4,66 @@
 module Brandish
   module Processors
     module All
+      # Provides both an `if` and an `unless` block into the output.  The
+      # processor takes one option: `:embed`.  If embed _is_ `true` (using
+      # strict equalivalence `equal?`), then the if statement takes a single
+      # pair, named `"condition"`.  This condition is executed using
+      # {Brandish::Execute}, and if it is true, and if it is an `if` block,
+      # the contents are included; otherwise, if it is false, and if it is
+      # an `unless` block, the contents are included; otherwise, they are
+      # ignored.  If embed is `false`, the block can take multiple pairs, and
+      # each pair is matched to a name.  If the pair's value equals the matched
+      # name's value, then the condition is true.  If the condition is true,
+      # and the block is an `if` block, the contents are included; otherwise,
+      # if it is false, and if it is an `unless` block, the contents are
+      # included; otherwise, they are not.  The pair conditions that are
+      # matched by default are `"format"` and `"form"`.  If pairs are included
+      # that are not provided, it errors.
+      #
+      # Options:
+      #
+      # - `:embed` - Optional.  Whether or not the condition should be
+      #   treaded like an embedded condition.  This must be set to the exact
+      #   value of `true` for it to be accepted.
+      #
+      # @example non-embed
+      #   <if format="html">
+      #     <import file="html-style" />
+      #   </if>
+      # @example embed
+      #   <if condition="@format == :html">
+      #     <import file="html-style" />
+      #   </if>
+      # @note
+      #   Using the `:embed` option is **very dangerous** - ONLY USE IF YOU
+      #   TRUST THE SOURCE.  `:embed` provides no sandboxing by default.  This
+      #   is why its value _must_ be set to be `true` exactly, and not
+      #   any other value.
       class If < Processor::Base
         include Processor::Block
-
         self.names = [:if, :unless]
         register %i(all if) => self
 
+        # If {#meets_conditions?} is true, this accepts the body of the block
+        # for processing; otherwise, it returns `nil`, effectively causing
+        # the body to be ignored.
+        #
+        # @return [Parser::Node, nil]
         def perform
           accept(@body) if meets_conditions?
         end
 
+        # If the name of this block is `"if"`, and all of the conditions are
+        # matched as outlined in the class direction, then this returns
+        # `true`; otherwise, if the name of this block is `"if"`, and any of
+        # the conditions are not matched as outlined in the class description,
+        # then this returns `false`; otherwise, if the name of this block is
+        # anything else (i.e. `"unless"`), and all of the conditions are
+        # matched as outlined in the class description, then this returns
+        # `false`; otherwise, if any of the conditions are not matched as
+        # outlined in the class description, then this returns `true`.
+        #
+        # @return [::Boolean]
         def meets_conditions?
           @name == "if" ? match_conditions : !match_conditions
         end
@@ -21,7 +71,7 @@ module Brandish
       private
 
         def match_conditions
-          @options[:embed] ? exec_condition : pair_condition
+          true.equal?(@options[:embed]) ? exec_condition : pair_condition
         end
 
         def exec_condition

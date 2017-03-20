@@ -6,6 +6,9 @@ module Brandish
   # All libraries errors inherit from this class.
   class Error < ::StandardError; end
 
+  # The file could not be found.
+  class NoFileError < Error; end
+
   # An error that is created when there is a problem with scanning the
   # document.
   class ScanError < Error; end
@@ -13,6 +16,9 @@ module Brandish
   # An error that occurs with setting up a processor.  This has no location
   # information because this error occurs independant of a document.
   class ProcessorError < Error; end
+
+  # The processor has not been implemented.
+  class ProcessorNotImplementedError < ProcessorError; end
 
   # This should never be used directly.  This is an error that is tied to
   # a location; as such, it provides an initalizer for providing a location.
@@ -41,4 +47,19 @@ module Brandish
 
   # An error occured during a build.
   class BuildError < LocationError; end
+
+  # An error occurred while building in a processor.  This includes location
+  # information from the original node.
+  class ProcessorBuildError < BuildError; end
+
+  # An error occurred while verifying the build.  This includes location
+  # information for the invalid node.
+  class VerificationBuildError < ProcessorBuildError; end
+
+  # An error occurred with a part of a command or block node, in which a pair
+  # was not included.
+  class PairError < ProcessorBuildError; end
+
+  # The syntax used for the styling was invalid.
+  class ElementSyntaxError < ProcessorBuildError; end
 end

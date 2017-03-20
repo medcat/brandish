@@ -36,7 +36,15 @@ module Brandish
         @context = context
         @context << self
         @options = options
+        setup
       end
+
+      # This is called by {#initialize}.  This allows subclasses to perform
+      # any nessicary setups without having to override {#initialize}.  This
+      # does nothing by default.
+      #
+      # @return [void]
+      def setup; end
 
       # Processes the given node.  By default, it checks the classes of the
       # inbound node, and maps them to `process_*` blocks.  If it doesn't
@@ -52,22 +60,11 @@ module Brandish
       # @param node [Parser::Node] A parser node to handle.
       # @return [Parser::Node, nil] The result of processing.
       def call(node)
-        result = _switch_node(node)
-
-        _fix_result(result)
-
-        if result.is_a?(Parser::Node)
-          result
-        elsif result.is_a?(::String)
-          Parser::Node::Text.new(value: result, location: node.location)
-                            .prevent_update
-        elsif result
-
-        end
+        _fix_result(_switch_node(node), node)
       rescue LocationError then fail
       rescue => e
-        fail BuildError.new("#{e.class}: #{e.message} at #{node.location}",
-          node.location, e.backtrace)
+        fail BuildError.new("#{e.class}: #{e.message}", node.location,
+          e.backtrace)
       end
 
       # (see Context#accept)
@@ -105,7 +102,7 @@ module Brandish
       # Processes a text node.  By default, this performs no modifications on
       # the node, and returns the node itself.
       #
-      # @param node [Parser::Node::Root]
+      # @param node [Parser::Node::Text]
       # @return [::Object]
       def process_text(node)
         node
@@ -113,8 +110,9 @@ module Brandish
 
       # An optional post-process.
       #
+      # @param root [Parser::Node::Root]
       # @return [void]
-      def postprocess; end
+      def postprocess(root); end
 
     private
 
@@ -125,18 +123,19 @@ module Brandish
         when Parser::Node::Root    then process_root(node)
         when Parser::Node::Text    then process_text(node)
         else
-          fail ArgumentError, "Expected node, got #{node.class}"
+          fail ArgumentError, "Expected node, got `#{node.class}'"
         end
       end
 
-      def _fix_result(result)
+      def _fix_result(result, node)
         case result
-        when Parser::Node, nil then result
+        when Parser::Node, nil
+          result
         when ::String
           Parser::Node::Text.new(value: result, location: node.location)
                             .prevent_update
         else
-          fail ArgumentError, "Unknown result type `#{result.class}` " \
+          fail ArgumentError, "Unknown result type `#{result.class}' " \
             "(given from #{self.class})"
         end
       end

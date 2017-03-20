@@ -63,7 +63,6 @@ module Brandish
         template "brandish.config.rb"
         %w(source source/assets source/assets/styles source/assets/scripts
           templates output).each { |d| empty_directory(d) }
-        template "index.br", "source/index.br"
         template "Gemfile"
         inside(".") { run "bundle install" }
       end

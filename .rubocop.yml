@@ -9,6 +9,7 @@ Metrics/BlockLength:
   Exclude:
     - 'spec/*.rb'
     - 'spec/**/*.rb'
+    - 'brandish.gemspec'
 Metrics/AbcSize:
   Max: 25
 

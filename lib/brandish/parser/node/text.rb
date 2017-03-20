@@ -12,9 +12,9 @@ module Brandish
       class Text < Node
         # A set of tokens kinds that are allowed to be in a text node.
         #
-        # @return [Set<::Symbol>]
+        # @return [::Set<::Symbol>]
         TOKENS =
-          Set[:SPACE, :TEXT, :LINE, :NUMERIC, :ESCAPE, :'"', :"=", :"/"].freeze
+          ::Set[:SPACE, :TEXT, :LINE, :NUMERIC, :ESCAPE, :/, :'"', :'='].freeze
 
         # The value of the text node.  This is the string value of the source
         # text that this node is based off of.
@@ -42,7 +42,7 @@ module Brandish
         #   @param location [Location] The location of the text node.
         def initialize(tokens: nil, value: nil, location: nil)
           unless tokens || (value && location)
-            fail ArgumentError, "Expected either a set of tokens or a " \
+            fail ::ArgumentError, "Expected either a set of tokens or a " \
               "value and a location, got neither"
           end
 
@@ -87,7 +87,7 @@ module Brandish
 
         def derive_location(tokens)
           unless tokens
-            fail ArgumentError, "Expected either location or tokens, got" \
+            fail ::ArgumentError, "Expected either location or tokens, got" \
               " neither"
           end
 
@@ -105,7 +105,7 @@ module Brandish
         def assert_valid_tokens(tokens)
           valid = tokens.all? { |t| TOKENS.include?(t.kind) }
           return valid if valid
-          fail ArgumentError, "Expected tokens to all be one of " \
+          fail ::ArgumentError, "Expected tokens to all be one of " \
             "#{TOKENS.map(&:inspect).join(', ')}"
         end
       end

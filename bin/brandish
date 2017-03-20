@@ -7,4 +7,10 @@ $LOAD_PATH.unshift(load_path) unless $LOAD_PATH.include?(load_path)
 require "brandish"
 require "brandish/application"
 
+class Object
+  def taint
+    fail
+  end
+end
+
 Brandish::Application.call

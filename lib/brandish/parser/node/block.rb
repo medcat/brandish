@@ -48,8 +48,8 @@ module Brandish
         #
         # @return [::String]
         def inspect
-          "#<#{self.class} name=#{@name.inspect} body=#{@body.inspect} " \
-            "location=#{@location.inspect}>"
+          "#<#{self.class} name=#{@name.inspect} pairs=#{@pairs.inspect} " \
+            "body=#{@body.inspect} location=#{@location.inspect}>"
         end
 
         # Equates this object with another object.  If the other object is

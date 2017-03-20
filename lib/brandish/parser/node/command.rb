@@ -64,6 +64,14 @@ module Brandish
             @location == other.location && @pairs == other.pairs)
         end
 
+        # Pretty inspect.
+        #
+        # @return [::String]
+        def inspect
+          "#<#{self.class} name=#{@name.inspect} pairs=#{@pairs.inspect} " \
+            "location=#{@location.inspect}>"
+        end
+
       private
 
         def update_name(name)

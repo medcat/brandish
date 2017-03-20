@@ -12,8 +12,8 @@ module Brandish
       #
       # @return [Parser::Node]
       def parse_document
-        body = collect(:EOF) { parse_document_element }
-        expect([:EOF])
+        body = collect(EOF_SYMBOL) { parse_document_element }
+        expect(EOF_SYMBOL)
         Node::Root.new(children: body)
       end
 
@@ -25,11 +25,7 @@ module Brandish
       #
       # @return [Node] The node for the element.
       def parse_document_element
-        if peek?([:"<"])
-          parse_document_meta
-        else
-          parse_document_text
-        end
+        peek?(LESS_THAN_SYMBOL) ? parse_document_meta : parse_document_text
       end
 
       # parses a "meta" element from the document.  In this sense, it is
@@ -38,11 +34,11 @@ module Brandish
       # {#parse_document_command}; otherwise, it calls {#parse_document_block}.
       #
       # @return [Node]
-      def parse_document_meta(start = expect([:"<"]))
-        name = expect([:TEXT])
+      def parse_document_meta(start = expect(LESS_THAN_SYMBOL))
+        name = expect(TEXT_SYMBOL)
         parse_skip_space
-        arguments = collect([:"/", :">"]) { parse_document_command_argument }
-        if peek?([:"/"])
+        arguments = collect(SLASH_OR_GREATER_THAN_SYMBOL) { parse_document_command_argument }
+        if peek?(SLASH_SYMBOL)
           parse_document_command(start, name, arguments)
         else
           parse_document_block(start, name, arguments)
@@ -59,8 +55,8 @@ module Brandish
       # @param arguments [<Node::Pair>] The arguments to the command.
       # @return [Node::Command] The command node.
       def parse_document_command(start, name, arguments)
-        expect([:"/"])
-        stop = expect([:">"])
+        expect(SLASH_SYMBOL)
+        stop = expect(GREATER_THAN_SYMBOL)
 
         Node::Command.new(name: name, arguments: arguments,
           location: start.location.union(stop.location))
@@ -76,7 +72,7 @@ module Brandish
         parse_skip_space
         key = parse_document_command_argument_key
         parse_skip_space
-        expect([:"="])
+        expect(EQUAL_SYMBOL)
         parse_skip_space
         value = parse_document_command_argument_value
         parse_skip_space
@@ -90,7 +86,7 @@ module Brandish
       #
       # @return [Scanner::Token]
       def parse_document_command_argument_key
-        expect([:TEXT])
+        expect(TEXT_SYMBOL)
       end
 
       # The value for the command argument.  This can be either a string, or
@@ -102,7 +98,7 @@ module Brandish
       #
       # @return [Node]
       def parse_document_command_argument_value
-        if peek?([:'"'])
+        if peek?(QUOTE_SYMBOL)
           parse_document_string
         else
           Node::Text.new(tokens: [expect(Node::Text::TOKENS)])
@@ -120,11 +116,11 @@ module Brandish
       # @param arguments [<Node::Pair>] The arguments to the block.
       # @return [Node::Block]
       def parse_document_block(start, name, arguments)
-        expect([:">"])
+        expect(GREATER_THAN_SYMBOL)
         body = parse_document_block_body
-        expect([:"/"])
-        match = expect([:TEXT])
-        stop = expect([:">"])
+        expect(SLASH_SYMBOL)
+        match = expect(TEXT_SYMBOL)
+        stop = expect(GREATER_THAN_SYMBOL)
 
         unless name.value == match.value
           fail ParseError.new("Unexpected #{match.value.inspect}, expected" \
@@ -144,9 +140,9 @@ module Brandish
       def parse_document_block_body
         children = []
         loop do
-          if peek?([:"<"])
-            start = expect([:"<"])
-            break if peek?([:"/"])
+          if peek?(LESS_THAN_SYMBOL)
+            start = expect(LESS_THAN_SYMBOL)
+            break if peek?(SLASH_SYMBOL)
             children << parse_document_meta(start)
           else
             children << parse_document_text
@@ -164,10 +160,9 @@ module Brandish
       #
       # @return [Node::String]
       def parse_document_string
-        allowed = (Node::Text::TOKENS - Set[:'"']) + Set[:<, :>]
-        start = expect([:'"'])
-        children = collect(:'"') { expect(allowed) }
-        stop = expect([:'"'])
+        start = expect(QUOTE_SYMBOL)
+        children = collect(QUOTE_SYMBOL) { expect(Node::String::TOKENS) }
+        stop = expect(QUOTE_SYMBOL)
         location = start.location.union(stop.location)
 
         Node::String.new(tokens: children, location: location)
@@ -189,8 +184,54 @@ module Brandish
       #
       # @return [void]
       def parse_skip_space
-        expect(%i(SPACE LINE)) while peek?(%i(SPACE LINE))
+        expect(SPACE_SYMBOLS) while peek?(SPACE_SYMBOLS)
       end
+
+      # A set containing the kind symbol for a quote.
+      #
+      # @return [::Set<::Symbol>]
+      QUOTE_SYMBOL = ::Set[:'"']
+
+      # A set containing the kind symbol for an equal sign.
+      #
+      # @return [::Set<::Symbol>]
+      EQUAL_SYMBOL = ::Set[:'=']
+
+      # A set containing the kind symbol for a less than symbol.
+      #
+      # @return [::Set<::Symbol>]
+      LESS_THAN_SYMBOL = ::Set[:<]
+
+      # A set containing the kind symbol for a greater than symbol.
+      #
+      # @return [::Set<::Symbol>]
+      GREATER_THAN_SYMBOL = ::Set[:>]
+
+      # A set containing the kind symbol for a forward slash symbol.
+      #
+      # @return [::Set<::Symbol>]
+      SLASH_SYMBOL = ::Set[:/]
+
+      # A set containing the kind symbols for a forward slash or a greater than
+      # symbol.
+      #
+      # @return [::Set<::Symbol>]
+      SLASH_OR_GREATER_THAN_SYMBOL = SLASH_SYMBOL | GREATER_THAN_SYMBOL
+
+      # A set containing the kind symbols for a text symbol.
+      #
+      # @return [::Set<::Symbol>]
+      TEXT_SYMBOL = ::Set[:TEXT]
+
+      # A set containing the kind symbols for a space symbol.
+      #
+      # @return [::Set<::Symbol>]
+      SPACE_SYMBOLS = ::Set[:SPACE, :LINE]
+
+      # A set containing the kind symbols for a eof symbol.
+      #
+      # @return [::Set<::Symbol>]
+      EOF_SYMBOL = ::Set[:EOF]
     end
   end
 end

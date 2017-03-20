@@ -68,52 +68,38 @@ module Brandish
         include Hanami::Helpers::EscapeHelper
         register %i(html markup) => self
 
-        engine(:kramdown, {}, :initialize_kramdown, :markup_kramdown)
-        engine(:rdiscount, [:smart], :initialize_rdiscount, :markup_rdiscount)
+        engine(:kramdown, {}, nil, :markup_kramdown)
+        engine(:rdiscount, [:smart], nil, :markup_rdiscount)
         engine(:minidown, {}, :initialize_minidown, :markup_minidown)
-        engine(:redcloth, [], :initialize_redcloth, :markup_redcloth)
+        engine(:redcloth, [], nil, :markup_redcloth)
         engine(:redcarpet, {}, :initialize_redcarpet, :markup_redcarpet)
-        engine(:creole, { extensions: true }, :initialize_creole, :markup_creole)
-        engine(:sanitize, :relaxed, :initialize_sanitize, :markup_sanitize)
+        engine(:creole, { extensions: true }, nil, :markup_creole)
+        engine(:sanitize, :relaxed, nil, :markup_sanitize)
         engine(:escape, nil, nil, :markup_escape)
 
       private
-
-        def initialize_kramdown
-          require "kramdown"
-        end
 
         def markup_kramdown(value, options)
           Kramdown::Document.new(value, options).to_html
         end
 
-        def initialize_rdiscount
-          require "rdiscount"
-        end
-
         def markup_rdiscount(value, options)
-          RDiscount.new(value, *options).to_html
+          ::RDiscount.new(value, *options).to_html
         end
 
         def initialize_minidown
-          require "minidown"
-          @parser = Minidown::Parser.new(engine_options)
+          @parser = ::Minidown::Parser.new(engine_options)
         end
 
         def markup_minidown(value, _)
           @parser.render(value)
         end
 
-        def initialize_redcloth
-          require "redcloth"
-        end
-
         def markup_redcloth(value, options)
-          RedCloth.new(value, options).to_html
+          ::RedCloth.new(value, options).to_html
         end
 
         def initialize_redcarpet
-          require "redcarpet"
           data = engine_options.merge(format: :html, context: @context)
           @format = ::Brandish::Markup::Redcarpet::Format.new(data)
         end
@@ -122,24 +108,18 @@ module Brandish
           @format.render(value)
         end
 
-        def initialize_creole
-          require "creole"
-        end
-
         def markup_creole(value, options)
-          Creole::Parser.new(value, options).to_html
+          ::Creole::Parser.new(value, options).to_html
         end
 
         def initialize_sanitize
-          require "sanitize"
-          if engine_options.is_a?(::Symbol)
-            @_engine_options =
-              Sanitize::Config.const_get(engine_options.to_s.upcase)
-          end
+          return unless engine_options.is_a?(::Symbol)
+          @_engine_options =
+            ::Sanitize::Config.const_get(engine_options.to_s.upcase)
         end
 
         def markup_sanitize(value, options)
-          Sanitize.fragment(value, options)
+          ::Sanitize.fragment(value, options)
         end
 
         def markup_escape(value, _options)

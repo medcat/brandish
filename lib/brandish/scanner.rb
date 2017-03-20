@@ -18,9 +18,6 @@ module Brandish
 
     # Initialize the scanner with the given source and file.  If no file
     # is given, it defaults to `<anon>`.
-    #
-    # @param source [::String] The source to read from.
-    # @param file [::String] The name of the file that this originates from.
     def initialize(*args, **options)
       super(*args)
       @options = DEFAULT_OPTIONS.merge(options)

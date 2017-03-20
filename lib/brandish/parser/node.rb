@@ -68,6 +68,10 @@ module Brandish
         node
       end
 
+      def update_prevented?
+        !respond_to?(:update)
+      end
+
     protected
 
       # Updates an attribute on the node.  This is used for {#update}.
@@ -75,9 +79,7 @@ module Brandish
       # @param name [::Symbol, ::String] The name of the attribute.
       # @param value [::Object] The value of the attribute.
       def update_attribute(name, value)
-        if respond_to?(:"update_#{name}", true)
-          return send(:"update_#{name}", value)
-        end
+        return send(:"update_#{name}", value) if respond_to?(:"update_#{name}", true)
 
         fail NodeError.new("Unable to update attribute #{name} on #{self}",
           @location)

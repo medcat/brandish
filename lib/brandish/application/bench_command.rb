@@ -3,16 +3,10 @@
 
 module Brandish
   class Application
-    # The build command.  This just builds the project in the set directory.
-    class BuildCommand
+    # The bench command.  This builds the project in the set directory,
+    # and benchmarks.  This is for debugging.
+    class BenchCommand
       include Commander::Methods
-
-      # The description for the build command.
-      #
-      # @return [::String]
-      COMMAND_DESCRIPTION =
-        "Builds an existing Brandish project.  If no directory is specified " \
-        " using --directory or -d, it defaults to the current directory."
 
       # Defines the command on the given application.  This sets the important
       # data information for the command, for use for the help output.
@@ -22,9 +16,9 @@ module Brandish
       # @return [void]
       def self.define(application, command)
         command.syntax = "brandish build"
-        command.description = COMMAND_DESCRIPTION
-        command.option "-o", "--only NAMES", [::String],
-          "Which forms to build.  If this is omitted, it defaults to all."
+        command.option "-o", "--only NAMES", [::String]
+        command.option "-p", "--path PATH", ::String
+        command.option "-n", "--name NAME", ::String
 
         command.action { |_, o| call(application, o.__hash__) }
       end
@@ -32,7 +26,7 @@ module Brandish
       # The default options for the build command.
       #
       # @return [{::Symbol => ::Object}]
-      DEFAULTS = { only: :all }.freeze
+      DEFAULTS = { only: :all, path: "profile", name: "default" }.freeze
 
       # Performs the build command.  This initializes the command, and
       # calls {#call}.
@@ -60,13 +54,42 @@ module Brandish
       #
       # @return [void]
       def call
-        configure = @application.load_configuration_file
-        @application.progress(configure.build(@options[:only]).to_a, &:call)
+        require "ruby-prof"
+        require "benchmark"
+
+        @configure = @application.load_configuration_file
+        @path = ::Pathname.new(@options[:path]).expand_path(Dir.pwd)
+        @path.mkpath
+        say "=> Beginning build..."
+
+        result = nil
+        time = Benchmark.measure { result = RubyProf.profile { perform_build } }
+        say "-> Build ended, time: #{time}"
+        say "=> Outputting profile..."
+
+        result.eliminate_methods!(method_eleminations)
+        output_profile(result)
+      end
+
+    private
+
+      def output_profile(result)
+        printer = RubyProf::MultiPrinter.new(result)
+        printer.print(path: @path, profile: @options[:name])
+        say "-> Profile output to `#{@options[:path]}'!"
+      end
+
+      def perform_build
+        @configure.build(@options[:only]).each(&:call)
       rescue => e
-        say_error "\n!> Error while building!"
-        say_error "!> #{e.location}" if e.respond_to?(:location)
-        say_error "!> Received exception: #{e.class}: #{e.message}"
-        e.backtrace.each { |l| say_warning "\t~> in #{l}" } if @options[:trace]
+        say_error "!> Error while building!"
+        say_error "-> Received exception: #{e.class}: #{e.message}"
+        e.backtrace.each { |l| say_warning "\t-> in #{l}" } if @options[:trace]
+        exit!
+      end
+
+      def method_eleminations
+        [/\A(Set|Class|Array|Enumerable)#/]
       end
     end
   end

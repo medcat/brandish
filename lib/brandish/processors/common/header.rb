@@ -11,10 +11,9 @@ module Brandish
       # @abstract
       class Header < Processor::Base
         include Processor::Command
-        self.name = :header
 
-        # (see Processor::Command#initialize)
-        def initialize(context, options)
+        # (see Processor::Base#setup)
+        def setup
           super
           @context[:headers] = []
         end
@@ -34,7 +33,8 @@ module Brandish
         # @abstract
         # @return [Parser::Node::Text] The resulting header text.
         def header_render
-          fail NotImplementedError, "Please implement #{self.class}#header_render"
+          fail ProcessorNotImplementedError,
+            "Please implement #{self.class}#header_render"
         end
 
         # The header data used for the internal `:headers` structure.

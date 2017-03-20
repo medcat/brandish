@@ -21,7 +21,7 @@ module Brandish
         def assumed_class_name
           to_s
             .gsub(/\A(?:.+::)?(.*?)\z/, "\\1")
-            .gsub(/(?<!\A)[A-Z]/) { |m| "_#{m}" }
+            .gsub(/(?<!\A)[A-Z]/) { |m| "-#{m}" }
             .downcase
         end
 
@@ -47,6 +47,7 @@ module Brandish
         alias_method :name=, :names
       end
 
+      # The instance methods on the including class.
       module InstanceMethods
         # (see ClassMethods#allowed_names)
         def allowed_names

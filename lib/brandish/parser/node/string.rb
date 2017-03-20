@@ -8,6 +8,10 @@ module Brandish
       # a {Text} node, but has no restriction on the allowed values for the
       # node.
       class String < Text
+        # A set of tokens kinds that are allowed to be in a string node.
+        #
+        # @return [::Set<::Symbol>]
+        TOKENS = (Node::Text::TOKENS - ::Set[:'"']) + ::Set[:<, :>]
       end
     end
   end

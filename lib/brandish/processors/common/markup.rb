@@ -61,8 +61,8 @@ module Brandish
           engines[name] = [default.freeze, initializer, processor]
         end
 
-        # (see Processor::Base#initialize)
-        def initialize(context, options)
+        # (see Processor::Base#setup)
+        def setup
           super
           initialize_engine
         end
@@ -82,7 +82,7 @@ module Brandish
           when ::Proc   then @engine[1].call
           when nil      then return
           else
-            fail ProcessorError, "Unknown initializer `#{@engine[1].inspect}`"
+            fail ProcessorError, "Unknown initializer `#{@engine[1].inspect}'"
           end
         end
 
@@ -95,7 +95,7 @@ module Brandish
           when ::Proc
             [{}, nil, engine]
           else
-            fail ProcessorError, "Unknown engine `#{engine.inspect}`"
+            fail ProcessorError, "Unknown engine `#{engine.inspect}'"
           end
         end
 
@@ -108,11 +108,9 @@ module Brandish
           when ::Symbol then send(@engine[2], value, engine_options)
           when ::Proc   then @engine[2].call(value, engine_options)
           else
-            fail ProcessorError, "Unknown processor `#{@engine[2].inspect}`"
+            fail ProcessorError, "Unknown processor `#{@engine[2].inspect}'"
           end
         end
-
-      private
 
         def _build_engine_options
           if @engine[0].is_a?(::Hash)

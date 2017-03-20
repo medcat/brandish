@@ -1,6 +1,9 @@
 # encoding: utf-8
 # frozen_string_literal: true
 
+require "pry"
+require "pry-rescue"
+
 module Brandish
   class Configure
     # A form used for building.
@@ -15,11 +18,11 @@ module Brandish
       # @return [void]
       def build(configure)
         context = Processor::Context.new(configure, self)
-        root = configure.roots[configure.source / entry]
+        root = configure.roots[configure.sources.find(entry)]
 
-        processors.each do |processor|
-          klass = Processor.all.fetch([processor[0], processor[1]])
-          klass.new(context, processor[2])
+        processors.each do |(processor, options)|
+          klass = processor.is_a?(::Array) ? Processor.all.fetch(processor) : processor
+          klass.new(context, options)
         end
 
         context.process(root)
