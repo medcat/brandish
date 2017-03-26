@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "A markup language for compiling to different formats."
   spec.description   = spec.summary
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = "https://github.com/medcat/brandish"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
