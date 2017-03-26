@@ -1,8 +1,6 @@
 # encoding: utf-8
 # frozen_string_literal: true
 
-require "pry"
-
 module Brandish
   module Markup
     module Redcarpet

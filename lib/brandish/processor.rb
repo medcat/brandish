@@ -4,6 +4,7 @@
 require "brandish/processor/base"
 require "brandish/processor/context"
 require "brandish/processor/name_filter"
+require "brandish/processor/pair_filter"
 require "brandish/processor/block"
 require "brandish/processor/command"
 require "brandish/processor/descend"

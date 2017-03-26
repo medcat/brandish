@@ -14,7 +14,7 @@ module Brandish
       # @return [void]
       def self.included(base)
         base.include Processor::NameFilter
-        base.include Processor::Pairfilter
+        base.include Processor::PairFilter
       end
 
       # Processes the block.  If the node's name doesn't match the name for

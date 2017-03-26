@@ -42,9 +42,7 @@ module Brandish
           allowed_names.merge(Array(names).flatten.map(&:to_s))
         end
 
-        alias_method :name, :names
         alias_method :names=, :names
-        alias_method :name=, :names
       end
 
       # The instance methods on the including class.
