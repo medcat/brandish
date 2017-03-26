@@ -57,7 +57,7 @@ module Brandish
 
           def style_highlight_rouge
             file = @pairs.fetch("output", "highlight/rouge/#{highlight_theme}.css")
-            output_path = output_styles_path / file
+            output_path = output_assets_path / file
             output_path.dirname.mkpath
             link_path = output_path.relative_path_from(@context.configure.output)
             output_path.write(highlight_rouge_value)
@@ -67,7 +67,7 @@ module Brandish
 
           def style_highlight_pygments
             file = @pairs.fetch("output", "highlight/pygments/#{highlight_theme}.css")
-            output_path = output_styles_path / file
+            output_path = output_assets_path / file
             output_path.dirname.mkpath
             link_path = output_path.relative_path_from(@context.configure.output)
             output_path.write(highlight_pygments_value)

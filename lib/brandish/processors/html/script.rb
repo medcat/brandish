@@ -33,6 +33,8 @@ module Brandish
       #   on the body, and pushes the result as an inline style.
       # - `"remote-inline"` - A command.  Similar to `"remote"`; however,
       #   this takes the remote styles as an inline style.
+      # - `"link"` - A command.  Similar to `"remote"`; however, it does not
+      #   copy down the remote script.
       #
       # Pairs:
       #

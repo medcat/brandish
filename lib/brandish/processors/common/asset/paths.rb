@@ -82,7 +82,9 @@ module Brandish
               @pairs.fetch("output") { asset_path.sub_ext(asset_kind_extension) }
             # The actual output path of the file.
             file_output_path = output_assets_path / raw_output_path
-            src_output_path = file_output_path.relative_path_from(output_path)
+            src_output_path = file_output_path
+              .relative_path_from(output_path)
+              .expand_path(@options.fetch(:root, "/"))
 
             { file: path, out: file_output_path, src: src_output_path }
           end

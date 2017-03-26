@@ -119,7 +119,8 @@ module Brandish
     def find(short, options = {})
       find_all(short, options).next
     rescue ::StopIteration
-      fail NoFileError, "Could not find `#{short}' in any of the given paths (paths: #{@paths})"
+      fail NoFileError, "Could not find `#{short}' in any of the given paths " \
+        "(paths: #{@paths.map(&:to_s).join(', ')})"
     end
 
     # Finds all versions of the short path name in the paths in the path

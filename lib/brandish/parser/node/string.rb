@@ -12,6 +12,15 @@ module Brandish
         #
         # @return [::Set<::Symbol>]
         TOKENS = (Node::Text::TOKENS - ::Set[:'"']) + ::Set[:<, :>]
+
+      private
+
+        def assert_valid_tokens(tokens)
+          valid = tokens.all? { |t| TOKENS.include?(t.kind) }
+          return valid if valid
+          fail ::ArgumentError, "Expected tokens to all be one of " \
+            "#{TOKENS.map(&:inspect).join(', ')}"
+        end
       end
     end
   end

@@ -13,11 +13,6 @@ module Brandish
         include Hanami::Helpers::HtmlHelper
         include Hanami::Helpers::EscapeHelper
 
-        # The tags for each level of header.
-        #
-        # @return [<::Symbol>]
-        TAGS = %i(h1 h2 h3 h4 h5 h6).freeze
-
         # Initialize the renderer with the given context and options.
         #
         # @param context [Processor::Context]
@@ -41,7 +36,8 @@ module Brandish
         def header(text, level)
           text, id = split_text(text)
 
-          html.tag(TAGS.fetch(level), raw(text), id: id).to_s
+          html.tag(Processors::HTML::Header::TAGS.fetch(level), raw(text),
+            id: id).to_s
         end
 
         # Highlights a block of code.

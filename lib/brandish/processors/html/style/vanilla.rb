@@ -29,7 +29,7 @@ module Brandish
         private
 
           def style_inline_remote
-            uri = URI(load_style_file)
+            uri = URI(load_asset_file)
             file = open(uri)
             content = file.read
             file.close
@@ -38,10 +38,10 @@ module Brandish
           end
 
           def style_file_remote
-            uri = URI(load_style_file)
+            uri = URI(load_asset_file)
             file = open(uri)
             asset_path = @pairs.fetch("output") { uri_path(uri) }
-            output_path = output_styles_path / asset_path
+            output_path = output_assets_path / asset_path
             output_path.dirname.mkpath
             link_path = output_path.relative_path_from(@context.configure.output)
             output = output_path.open("wb")

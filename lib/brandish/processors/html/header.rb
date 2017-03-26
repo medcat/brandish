@@ -29,15 +29,16 @@ module Brandish
         # The tags to use for each header level.  This is just `h1` through
         # `h6`.
         #
-        # @return [::Symbol]
-        TAGS = %i(h1 h2 h3 h4 h5 h6).freeze
+        # @return [{::Numeric => ::Symbol}]
+        TAGS = { 1 => :h1, 2 => :h2, 3 => :h3, 4 => :h4, 5 => :h5,
+          6 => :h6 }.freeze
 
         # Renders the proper HTML tag for the header, including the proper
         # id, and an optional class value from the pairs.
         #
         # @return [::String]
         def header_render
-          html.tag(TAGS.fetch(header_level - 1), header_value, id: header_id,
+          html.tag(TAGS.fetch(header_level), header_value, id: header_id,
             class: @pairs.fetch("class", "")).to_s
         end
       end

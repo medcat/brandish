@@ -127,9 +127,9 @@ module Brandish
             " #{name.value.inspect}", match.location)
         end
 
+        parts = [start, body, match, stop, *arguments].map(&:location)
         Node::Block.new(name: name, body: body, arguments: arguments,
-          location: start.location.union(body.location, match.location,
-            stop.location, *arguments.map(&:location)))
+          location: parts.inject(:union))
       end
 
       # Parses the body of a block tag.  This keeps attempting to parse text
@@ -163,7 +163,7 @@ module Brandish
         start = expect(QUOTE_SYMBOL)
         children = collect(QUOTE_SYMBOL) { expect(Node::String::TOKENS) }
         stop = expect(QUOTE_SYMBOL)
-        location = start.location.union(stop.location)
+        location = start.location | stop.location
 
         Node::String.new(tokens: children, location: location)
       end

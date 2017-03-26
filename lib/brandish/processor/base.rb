@@ -60,6 +60,11 @@ module Brandish
       # @param node [Parser::Node] A parser node to handle.
       # @return [Parser::Node, nil] The result of processing.
       def call(node)
+        dup.call!(node)
+      end
+
+      # (see #call)
+      def call!(node)
         _fix_result(_switch_node(node), node)
       rescue LocationError then fail
       rescue => e

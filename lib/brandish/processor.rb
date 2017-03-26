@@ -7,6 +7,7 @@ require "brandish/processor/name_filter"
 require "brandish/processor/pair_filter"
 require "brandish/processor/block"
 require "brandish/processor/command"
+require "brandish/processor/inline"
 require "brandish/processor/descend"
 
 module Brandish

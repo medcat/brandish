@@ -11,7 +11,7 @@ module Brandish
       # A placehodler object to denote that all pairs are allowed in the pair
       # set.  This is only inserted into the allowed pair set when
       # {ClassMethods#unrestricted_pairs!} is called.
-      ALL = Object.new.freeze
+      ALL = "$any".freeze
 
       # The class methods that are implemented on the including module.  This
       # is extended onto the class.
@@ -58,7 +58,7 @@ module Brandish
         #
         # @return [void]
         def unrestricted_pairs!
-          pairs PairFilter::ALL
+          pairs(PairFilter::ALL)
         end
         alias_method :unrestricted_pairs, :unrestricted_pairs!
       end
@@ -77,7 +77,7 @@ module Brandish
         # @return [void]
         def assert_valid_pairs
           return if allowed_pairs.include?(PairFilter::ALL)
-          excessive = @pairs.keys - allowed_pairs
+          excessive = @pairs.keys.to_set - allowed_pairs
           return unless excessive.any?
           fail PairError.new("Unexpected pairs found " \
             "(#{excessive.map(&:inspect).join(', ')})", @node.location)

@@ -160,7 +160,10 @@ module Brandish
     #
     # @return [{::Pathname => Parser::Root}]
     def roots
-      @_roots ||= ::Hash.new { |h, k| h[k] = parse_from(k) }
+      @_roots ||= ::Hash.new do |h, k|
+        h[k] = nil
+        h[k] = parse_from(k)
+      end
     end
 
     # Parses a file.  This bypasses the cache.

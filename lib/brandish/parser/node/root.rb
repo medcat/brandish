@@ -21,7 +21,6 @@ module Brandish
         def initialize(children:, location: nil)
           @children = children.freeze
           @location = location || derive_location(children)
-          fail unless children.any?
           freeze
         end
 

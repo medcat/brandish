@@ -18,13 +18,13 @@ module Brandish
     #   end
     class Inline < Base
       # Sets this processor as a command processor.  This includes
-      # {Command}, and passes the given names to 
+      # {Command}, and passes the given names to
       # {NameFilter::ClassMethods#name}.
       #
       # @return [void]
       def self.command!(*names)
         include Command
-        name(*names)
+        self.names = *names
       end
 
       # Sets this processor as a block processor.  This include {Block}, and
@@ -33,7 +33,7 @@ module Brandish
       # @return [void]
       def self.block!(*names)
         include Block
-        name(*names)
+        self.names = *names
       end
 
       # Defines the `#perform` method with the given block.  This is only

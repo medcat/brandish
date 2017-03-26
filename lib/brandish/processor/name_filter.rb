@@ -29,7 +29,7 @@ module Brandish
         #
         # @return [::Set<::String>]
         def allowed_names
-          @names ||= name ? Set.new : Set[assumed_class_name]
+          @names ||= name ? Set[assumed_class_name] : Set.new
         end
 
         # If no names are given, it retrieves them using {#allowed_names};

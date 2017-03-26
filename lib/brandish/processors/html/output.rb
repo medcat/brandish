@@ -44,7 +44,7 @@ module Brandish
 
         def find_path
           @options.fetch(:path) do
-            directory = @options.fetch(:directory, ".")
+            directory = ::Pathname.new(@options.fetch(:directory, "."))
             file = @options.fetch(:file) do
               ::Pathname.new(@context.form.entry).sub_ext(".html")
             end

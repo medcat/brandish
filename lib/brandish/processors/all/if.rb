@@ -25,6 +25,8 @@ module Brandish
       # - `:embed` - Optional.  Whether or not the condition should be
       #   treaded like an embedded condition.  This must be set to the exact
       #   value of `true` for it to be accepted.
+      # - `:conditions` - Optional.  A hash of extra conditions that can be
+      #   checked for non-embed if blocks.
       #
       # Pairs:
       #
@@ -101,7 +103,14 @@ module Brandish
         def match_pair
           @_match_pair ||= {
             "format" => @context.form.format, "form" => @context.form.name
-          }.freeze
+          }.merge!(custom_match_pair).freeze
+        end
+
+        def custom_match_pair
+          @options
+            .fetch(:conditions, {})
+            .map { |k, v| [k, v].map(&:to_s) }
+            .to_h.freeze
         end
       end
     end

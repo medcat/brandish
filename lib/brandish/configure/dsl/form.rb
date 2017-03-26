@@ -70,7 +70,7 @@ module Brandish
 
           if block_given?
             options = arguments[0]
-            processor = Class.new(Brandish::Processor::Base, &::Proc.new)
+            processor = Class.new(Brandish::Processor::Inline, &::Proc.new)
           else
             name = arguments[0]
             options = arguments[1]
