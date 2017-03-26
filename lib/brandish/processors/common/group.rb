@@ -8,12 +8,24 @@ module Brandish
     module Common
       # A "group."  This is for grouping together elements for styling
       # or logical purposes.  By default, this creates a block element.
+      #
+      # This takes no options.
+      #
+      # Pairs:
+      #
+      # - `"class"` - Optional.  See {#class_value}.
+      # - `"id"` - Optional.  See {#id_value}.
+      # - `"name"` - Optional.  See {#name_value}.
+      #
+      # @abstract
+      #   Implement {#perform} and register the processor with {.register}.
       class Group < Processor::Base
         include Processor::Block
+        pairs :class, :id, :name
 
         # The class value of the group.  This can have a 1-to-1 correspondence
         # to the destination source.  This works similarly to HTML's class
-        # attribute.
+        # attribute.  This uses the `"class"` pair.
         #
         # @return [::String]
         def class_value
@@ -22,7 +34,8 @@ module Brandish
 
         # The ID value of the group.  This can have a 1-to-1 correspondence
         # to the destination source.  This works similarly to HTML's id
-        # attribute; especially the concept that it should be unique.
+        # attribute; especially the concept that it should be unique.  This
+        # uses the `"id"` pair.
         #
         # @return [::String, nil]
         def id_value
@@ -31,7 +44,8 @@ module Brandish
 
         # The name value of the group.  This doesn't have a 1-to-1
         # correspondence to the destination source.  This is used to provide
-        # an internal styling or grouping process.
+        # an internal styling or grouping process.  This uses the `"name"`
+        # pair.
         #
         # @return [::String, nil]
         def name_value

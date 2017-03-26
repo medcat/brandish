@@ -8,6 +8,15 @@ module Brandish
     module Common
       # Outputs the result of processing the document.  Without this processor,
       # the document is not output, and most other processors have no effect.
+      #
+      # Options:
+      #
+      # - `:template` - Optional.  The name of the template to use.  This
+      #   defaults to the format used.
+      #
+      # @abstract
+      #   Please implement {#find_path} and {#template_data}, and register
+      #   the processor with {.register}.
       class Output < Processor::Base
         # Sets up the path and template for the output processor.  It first
         # attempts to find the output path, creating the directory to that

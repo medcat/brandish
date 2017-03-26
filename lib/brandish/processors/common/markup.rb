@@ -22,6 +22,8 @@ module Brandish
       #   markup engine.  The default values are dependant on the markup engine.
       #
       # @abstract
+      #   Implement engines using {.engine}, and register the processor using
+      #   {.register}.
       class Markup < Processor::Base
         # The engines defined for the subclass.  This should not be used on the
         # parent class ({Common::Markup}).  This returns a key-value pair for

@@ -12,6 +12,9 @@ module Brandish
       #   processor is never added to the context, preventing embed blocks from
       #   being used.
       #
+      # This takes no specific pairs; however, the embedded execution context
+      # has access to all of the pairs that are passed to the element.
+      #
       # @note
       #   This is **very dangerous** - ONLY USE IF YOU TRUST THE SOURCE.  This
       #   processor provides no sandboxing by default.
@@ -19,6 +22,7 @@ module Brandish
         include Processor::Block
         self.names = %i(embed ruby)
         register %i(all embed) => self
+        unrestricted_pairs!
 
         # (see Processor::Base#initlaize)
         def initialize(context, options = {})

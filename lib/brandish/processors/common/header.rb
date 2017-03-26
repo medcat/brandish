@@ -8,9 +8,23 @@ module Brandish
       # internally of all of the headers in the document, to later be used to
       # possibly create a table of contents, if needed.
       #
+      # This takes no options.
+      #
+      # Pairs:
+      #
+      # - `"level"` - Optional.  Defaults to `1`.  The "level" of the header.
+      #   This should be a value between 1 and 6.
+      # - `"value"` - Required.  The name of the header.
+      # - `"id"` - Optional.  The ID of the header.  This is a unique value
+      #   to reference to this header.  If no value is given, it defaults
+      #   to a modified `"value"`.
+      #
       # @abstract
+      #   Implement {#header_render}, and register the processor with
+      #   {.register}.
       class Header < Processor::Base
         include Processor::Command
+        pairs :level, :value, :id
 
         # (see Processor::Base#setup)
         def setup
@@ -64,7 +78,7 @@ module Brandish
         #
         # @return [::String]
         def header_id
-          @pairs.fetch("id") { header_value.downcase.gsub(/[^\w]|\_/, "-") }
+          @pairs.fetch("id") { header_value.downcase.gsub(/[^\w]|_/, "-") }
         end
       end
     end

@@ -4,7 +4,21 @@
 module Brandish
   module Processors
     module HTML
-      class Script < Common::Style
+      class Script < Common::Asset
+        # "Vanilla" scripting engines.  This just performs copying, and
+        # does not modify the contents of the styles at all.
+        #
+        # Engines:
+        #
+        # - `"file"` - A command.  Takes a file, and copies it over to the
+        #   destination, based on the values given in `#load_file_paths`.
+        # - `"remote"`, `"remote-file"` - A command.  Takes a URI (supports 
+        #   `http`, `https`, and `ftp`), and outputs the directory into the
+        #   `"output"` pair (or a uri path assumed from the URI).
+        # - `"inline"` - A block.  This performs {Parser::Node::Root#flatten}
+        #   on the body, and pushes the result as an inline style.
+        # - `"remote-inline"` - A command.  Similar to `"remote"`; however,
+        #   this takes the remote styles as an inline style.
         module Vanilla
           Script.engine "inline", :block, :script_inline
           Script.engine "file", :command, :script_file

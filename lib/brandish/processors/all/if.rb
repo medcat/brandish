@@ -26,6 +26,15 @@ module Brandish
       #   treaded like an embedded condition.  This must be set to the exact
       #   value of `true` for it to be accepted.
       #
+      # Pairs:
+      #
+      # - `"condition"` - Optional.  The embedded condition for the `if` or
+      #   `unless` block.  Only applies if the `:embed` option is set.
+      # - `"format"` - Optional.  If this is provided, and the `:embed` option
+      #   is not set, it is added as a condition.
+      # - `"form"` - Optional.  If this is provided, and the `:embed` option
+      #   is not set, it is added as a condition.
+      #
       # @example non-embed
       #   <if format="html">
       #     <import file="html-style" />
@@ -43,6 +52,7 @@ module Brandish
         include Processor::Block
         self.names = [:if, :unless]
         register %i(all if) => self
+        unrestricted_pairs!
 
         # If {#meets_conditions?} is true, this accepts the body of the block
         # for processing; otherwise, it returns `nil`, effectively causing

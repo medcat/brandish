@@ -33,6 +33,11 @@ module Brandish
       # - `:remote_allowed` - Optional.  Whether remote imports should be
       #   allowed.
       #
+      # Pairs:
+      #
+      # - `"src"`, `"file"`, `"name"`, or `"link"` - Required.  These all do the
+      #   same thing - it provides the name of the file to import.
+      #
       # @example local file
       #   <import file="some-file" />
       # @example remote file
@@ -45,6 +50,7 @@ module Brandish
       class Import < Processor::Base
         include Processor::Command
         register %i(all import) => self
+        pairs :src, :file, :name, :link
 
         # Accepts the root node of the parsed file, processing the result as
         # if it were an extension of the original source tree.

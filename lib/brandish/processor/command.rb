@@ -14,6 +14,7 @@ module Brandish
       # @return [void]
       def self.included(base)
         base.include Processor::NameFilter
+        base.include Processor::PairFilter
       end
 
       # Processes the command.  If the node's name doesn't match the name for
@@ -28,6 +29,8 @@ module Brandish
         @name = node.name
         @pairs = node.pairs
         @body = nil
+        
+        assert_valid_pairs
         perform
       end
 

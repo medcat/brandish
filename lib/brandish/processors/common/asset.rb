@@ -9,10 +9,29 @@ module Brandish
       # Allows assets to be included in the documents.  This is similar to the
       # markup processor in that it uses a concept of _engines_ in order to
       # power different kinds of assets.
+      #
+      # Options:
+      #
+      # - `:asset_load_paths` - Optional.  The load paths for the asset
+      #   processor.  These are used to resolve the asset file names, and are
+      #   passed directly to the {PathSet} created.
+      #
+      # Pairs:
+      #
+      # - `"src"`, `"file"`, `"name"`, or `"link"` - Required.  At least one
+      #   of these options are required.  They all perform the same function.
+      #   This defines the name or path of the asset to add or process.
+      # - `"type"` - Required.  The type of the asset to process.  This defines
+      #   how the asset is handled.
+      #
+      # @abstract
+      #   Implement engines using {.engine} and register the processor using
+      #   {.register}.
       class Asset < Processor::Base
         include Processor::Command
         include Processor::Block
         include Asset::Paths
+        pairs :src, :file, :name, :link, :type
 
         # The engines defined for the subclass.  This should not be used on the
         # parent class ({Common::Asset}).  This returns a key-value pair for
@@ -87,8 +106,11 @@ module Brandish
         end
 
         def find_engine
-          return [] unless self.class.engines.key?(@pairs.fetch("type"))
-          self.class.engines.fetch(@pairs.fetch("type"))
+          type = @pairs.fetch("type")
+            .gsub(/(?<=[\w])([A-Z])/) { |m| "-#{m}" }
+            .downcase
+          return [] unless self.class.engines.key?(type)
+          self.class.engines.fetch(type)
         end
       end
     end

@@ -22,23 +22,5 @@ module Brandish
     def self.format_modules
       (constants - [:All, :Common]).map { |c| Processors.const_get(c) }
     end
-
-    # Checks if the given module provides the {Common} processors.
-    # Essentially, it just checks if the module's constants are a subset
-    # of the {Common}'s constants.
-    #
-    # @param mod [Module]
-    # @return [Boolean]
-    def self.module_provides_common?(mod)
-      mod.constants <= Common.constants
-    end
-
-    # Checks if all of the {.format_modules} provide the {Common} processors,
-    # using {.module_provides_common?}.  This should **always** return `true`.
-    #
-    # @return [Boolean]
-    def self.formats_provide_common?
-      format_modules.all? { |m| module_provides_common?(m) }
-    end
   end
 end

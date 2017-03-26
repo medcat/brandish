@@ -7,6 +7,8 @@ module Brandish
   module Processors
     # Processors for generating LaTeX output.  This implements the {Common}
     # processors.
+    #
+    # @note This does not currently implement the Common processors.
     module Latex
     end
   end

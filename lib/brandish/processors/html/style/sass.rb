@@ -4,7 +4,27 @@
 module Brandish
   module Processors
     module HTML
-      class Style < Common::Style
+      class Style < Common::Asset
+        # A set of styling engines that provide access to Sass/SCSS.
+        #
+        # Engines:
+        #
+        # - `"sass"`, `"sass-file"`, `"scss"`, `"scss-file"` - A command.
+        #   These take a file and processes it, and outputs it to the output 
+        #   path given by `#load_file_paths`.  There is no difference 
+        #   between any of these engine types - the engine assumes the actual 
+        #   syntax of the file from the file extension.
+        # - `"sass-inline"` - A block.  This takes the block's contents,
+        #   performs {Parser::Node::Root#flatten} on it, and processes the
+        #   content as Sass.  This is then included as an inline stylesheet.
+        # - `"scss-inline" - A block.  Similar to `"sass-inline"`, except it
+        #   processes the content as SCSS.
+        #
+        # @note
+        #   The libraries that these engines depend on are not required in
+        #   by default; if any of these engines are used, the requisite 
+        #   libraries would have to be required by the `brandish.config.rb`
+        #   file.
         module Sass
           Style.engine "sass", :command, :style_file_sass
           Style.engine "scss", :command, :style_file_sass

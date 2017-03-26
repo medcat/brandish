@@ -4,14 +4,39 @@
 module Brandish
   module Processors
     module HTML
-      class Style < Common::Style
+      class Style < Common::Asset
+        # A Style engine for highlighting libraries.  This supports
+        # Rouge and Pygments.
+        #
+        # Engines:
+        #
+        # - `"highlight-rouge"`, `"highlight-rouge-file"` - A command.
+        #   Retrieves the given theme from the Rouge library, and outputs it
+        #   to the `"output"` pair (or `"highlight/rouge/<theme>.css"` by
+        #   default).
+        # - `"highlight-pygments", `"highlight-pygments-file"` - A command.
+        #   Retrieves the given theme from the Pygments library, and outputs
+        #   it to the `"output"` pair (or `"highlight/pygments/<theme>.css"`
+        #   by default).
+        # - `"highlight-rouge-inline"` - A command.  Retrieves the given theme
+        #   from the Rouge library, and uses it like an inline style.
+        # - `"highlight-pygments-inline"` - A command.  Retrieves the given
+        #   theme from the pygments library, and uses it like an inline
+        #   style.
+        #
+        # @note
+        #   The libraries that these engines depend on are not required in
+        #   by default; if any of these engines are used, the requisite 
+        #   libraries would have to be required by the `brandish.config.rb`
+        #   file.
         module Highlight
           Style.engine "highlight-rouge", :command, :style_highlight_rouge
-          Style.engine "highlight-pygments", :command, :style_highlight_rouge
+          Style.engine "highlight-pygments", :command, :style_highlight_pygments
           Style.engine "highlight-rouge-file", :command, :style_highlight_rouge
-          Style.engine "highlight-pygments-file", :command, :style_highlight_rouge
+          Style.engine "highlight-pygments-file", :command, :style_highlight_pygments
           Style.engine "highlight-rouge-inline", :command, :style_highlight_rouge_inline
           Style.engine "highlight-pygments-inline", :command, :style_highlight_pygments_inline
+          Style.pair :theme, :scope, :output
 
         private
 

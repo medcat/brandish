@@ -5,9 +5,26 @@ module Brandish
   module Processors
     module HTML
       class Script < Common::Asset
+        # A set of scripting engines that use the Coffee transpiler.
+        #
+        # Engines:
+        #
+        # - `"coffee"`, `"coffee-file"` - A command.  This takes the contents
+        #   of the resolved file, transpiles it, and outputs it into
+        #   the output path, given by `#load_file_paths`.
+        # - `"coffee-inline"` - A block.  Similar to `"coffee"`; however, it
+        #   takes the block, uses {Parser::Node::Root#flatten} on it,
+        #   transpiles the result, and adds that as an inline script.
+        #
+        # @note
+        #   The libraries that these engines depend on are not required in
+        #   by default; if any of these engines are used, the requisite 
+        #   libraries would have to be required by the `brandish.config.rb`
+        #   file.
         module Coffee
-          Script.engine "coffee-inline", :block, :script_coffee_inline
+          Script.engine "coffee", :command, :script_coffee_file
           Script.engine "coffee-file", :command, :script_coffee_file
+          Script.engine "coffee-inline", :block, :script_coffee_inline
 
         private
 

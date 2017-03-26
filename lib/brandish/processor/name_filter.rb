@@ -19,7 +19,7 @@ module Brandish
         #
         # @return [::String]
         def assumed_class_name
-          to_s
+          name
             .gsub(/\A(?:.+::)?(.*?)\z/, "\\1")
             .gsub(/(?<!\A)[A-Z]/) { |m| "-#{m}" }
             .downcase
@@ -29,7 +29,7 @@ module Brandish
         #
         # @return [::Set<::String>]
         def allowed_names
-          @names ||= Set[assumed_class_name]
+          @names ||= name ? Set.new : Set[assumed_class_name]
         end
 
         # If no names are given, it retrieves them using {#allowed_names};
