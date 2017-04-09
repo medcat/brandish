@@ -3,6 +3,7 @@
 
 require "brandish/version"
 require "brandish/errors"
+require "brandish/execute"
 require "brandish/path_set"
 require "brandish/configure"
 require "brandish/scanner"

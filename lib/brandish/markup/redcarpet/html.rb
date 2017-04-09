@@ -36,6 +36,7 @@ module Brandish
         def header(text, level)
           text, id = split_text(text)
 
+          @context[:headers] << { id: id, level: level.to_i, value: text }.freeze
           html.tag(Processors::HTML::Header::TAGS.fetch(level), raw(text),
             id: id).to_s
         end

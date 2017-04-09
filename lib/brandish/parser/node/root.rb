@@ -55,7 +55,7 @@ module Brandish
             when Node::Root then child.flatten
             when Node::Text then child.value
             else
-              fail NodeError.new("Unexpected node `#{child.class}",
+              fail NodeError.new("Unexpected node `#{child.class}'",
                 node.location)
             end
           end.join

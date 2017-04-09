@@ -117,7 +117,7 @@ module Brandish
         @form = form
         @descent = Processor::Descend.new(self)
         @buffer = []
-        @options = {}
+        @options = { headers: [] }
       end
 
       # Performs the processing of the given root node.  This should be a
