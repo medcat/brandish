@@ -8,11 +8,11 @@ module Support
     end
 
     def l(column, line = 1..1)
-      Brandish::Location.new("<anon>", line, column)
+      Yoga::Location.new("<anon>", line, column)
     end
 
     def t(type, column, value = type.to_s, line = 1..1)
-      Brandish::Scanner::Token.new(type, value, l(column, line))
+      Yoga::Token.new(type, value, l(column, line))
     end
   end
 end

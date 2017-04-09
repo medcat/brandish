@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 require "simplecov"
-SimpleCov.start { filter "/spec/" }
+SimpleCov.start { add_filter "/spec/" }
 require "brandish"
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration

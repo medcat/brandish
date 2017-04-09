@@ -3,6 +3,7 @@
 
 require "rubygems" # for Gem::Requirement
 require "securerandom"
+require "digest/sha2"
 require "forwardable"
 
 require "brandish/configure/dsl"
@@ -137,7 +138,7 @@ module Brandish
     # Given a set of forms to build, it yields blocks that can be called to
     # build a form.
     #
-    # This first clears the cache for file nodes.
+    # This first clears the filename cache for file nodes.
     #
     # @param which [::Symbol, <::Symbol>] If this is `:all`, all of the forms
     #   available are built; otherwise, it only builds the forms whose names
@@ -166,7 +167,7 @@ module Brandish
       end
     end
 
-    # Parses a file.  This bypasses the cache.
+    # Parses a file.  This bypasses the filename cache.
     #
     # @param path [::Pathname] The path to the actual file.  This should
     #   respond to `#read`.  If this isn't a pathname, the short should be
@@ -175,10 +176,21 @@ module Brandish
     #   location information.
     # @return [Parser::Root]
     def parse_from(path, short = path.relative_path_from(root))
-      Parser.new(Scanner.new(path.read, short, options).call).call
+      contents = path.read
+      digest = Digest::SHA2.digest(contents)
+
+      cache.fetch(digest) do
+        scanner = Scanner.new(contents, short, options)
+        parser = Parser.new(scanner.call)
+        parser.call.tap { |r| cache[digest] = r }
+      end
     end
 
   private
+
+    def cache
+      @_cache ||= ::Hash.new
+    end
 
     def default_paths
       sources <<

@@ -31,21 +31,13 @@ RSpec.describe Brandish::Parser::Node::Root do
       expect(updated.children).to eq children
     end
 
-    it "updates the location" do
-      expect(updated.location).to eq l(0..4)
+    it "does not update the location" do
+      expect(updated.location).to eq l(0..3)
     end
 
     it "does not modify the original" do
       expect(subject.children).to eq data[:children]
       expect(subject.location).to eq l(0..3)
-    end
-
-    context "without an assumed location" do
-      let(:data) { super().merge(location: l(0..3)) }
-
-      it "does not update the location" do
-        expect(updated.location).to eq l(0..3)
-      end
     end
   end
 

@@ -31,16 +31,9 @@ module Brandish
 
         # @param location [Location] The location of the block.
         def initialize(name:, body:, arguments: nil, pairs: nil, location: nil)
-          if !location && !arguments
-            fail ArgumentError, "Expected either a location or " \
-              "arguments, got neither"
-          end
-
           @name = name.is_a?(Yoga::Token) ? name.value : name
           @body = body
-          @location = location || arguments.map(&:location)
-                                           .inject(name.location.union(body.location),
-                                             :union)
+          @location = location || derive_location(arguments, name)
           @pairs = pairs.freeze || derive_pairs(arguments).freeze
         end
 
@@ -91,6 +84,12 @@ module Brandish
             k, v = pair.key, pair.value
             a.merge!(k.value => v.value)
           end.freeze
+        end
+
+        def derive_location(arguments, name = @name)
+          starting = name.location | @body.location
+          return starting unless arguments
+          arguments.map(&:location).inject(starting, :union)
         end
       end
     end

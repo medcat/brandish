@@ -6,6 +6,7 @@ require "support/parser_helper"
 RSpec.  describe Brandish::Parser::Node::Block do
   let(:data) do
     { name: t(:TEXT, 0..1, "a"),
+      pairs: [],
       body: n(:Root, children: [
         n(:Text, tokens: [t(:TEXT, 2..3, "b")])
       ]) } # "<a>b</a>"

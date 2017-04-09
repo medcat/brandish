@@ -1,6 +1,8 @@
 # encoding: utf-8
 # frozen_string_literal: true
 
+require "benchmark"
+
 module Brandish
   class Application
     # The serve command.  This builds, and then serves, an existing Brandish
@@ -119,8 +121,9 @@ module Brandish
       def perform_build
         builds = @configuration.build!(@options[:only])
         color "\r~> Building... ", :erase_line, :clear
-        builds.each(&:call)
-        color "\r=> Build completed at #{Time.now.strftime('%T.%L')}! ", :erase_line, :green
+        time = Benchmark.measure { builds.each(&:call) }
+        time_string = "#{Time.now.strftime('%T.%L')} (#{time.format('%t')}s)"
+        color "\r=> Build completed at #{time_string}! ", :erase_line, :green
 
       rescue => e
         say_error "\n!> Error while building!"

@@ -136,7 +136,7 @@ module Brandish
         case result
         when Parser::Node, nil
           result
-        when ::String
+        when ::String, Brandish::Future
           Parser::Node::Text.new(value: result, location: node.location)
                             .prevent_update
         else

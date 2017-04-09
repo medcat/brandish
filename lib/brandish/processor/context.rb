@@ -127,7 +127,7 @@ module Brandish
       # @return [::Object]
       def process(root)
         root = accept(root)
-        effective_processors.each { |p| p.postprocess(root) }
+        effective_processors.each { |p| p.postprocess(root) } if root
       end
 
       # Accepts a node.  This passes the node through all of the processors,
