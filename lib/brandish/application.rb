@@ -127,14 +127,6 @@ module Brandish
       super(array, options, &block)
     end
 
-    # The path to the configuration file.  This is used for
-    # {#load_configuration_file!}.
-    #
-    # @return [::Pathname]
-    def config_file_path
-      @directory / @config_file
-    end
-
     # If the configuration isn't already loaded, load it; otherwise, just
     # return the already loaded version of the configuration file.
     #
@@ -153,11 +145,15 @@ module Brandish
     # @return [Configure]
     def load_configuration_file!
       Brandish.reset_configuration
-      load config_file_path.to_s
+      load load_paths.find(@config_file).to_s
       fail "No configuration provided" unless Brandish.configuration
       Brandish.configuration
-    rescue LoadError
-      fail "No configuration provided"
+    end
+
+  private
+
+    def load_paths
+      @_load_paths ||= Brandish::PathSet.new << @directory
     end
   end
 end
