@@ -153,7 +153,7 @@ module Brandish
   private
 
     def load_paths
-      @_load_paths ||= Brandish::PathSet.new << @directory
+      @_load_paths ||= Brandish::PathSet.new.tap { |s| s << @directory }
     end
   end
 end

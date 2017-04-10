@@ -19,8 +19,9 @@ module Brandish
 
           html.ul(class: "contents") do
             _context[:headers].map do |header|
-              li(a(raw(header[:value]), href: "##{header[:id]}"),
-                class: "contents-item contents-item-#{header[:level]}")
+              li(class: "contents-item contents-item-#{header[:level]}") do
+                a(raw(header[:value]), href: "##{header[:id]}")
+              end
             end
           end.to_s
         end

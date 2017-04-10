@@ -12,7 +12,7 @@ module Brandish
           # The asset path for this kind of asset.
           #
           # @abstract
-          # @return [::String]
+          # @return [::String, nil]
           def asset_kind_path
             nil
           end
@@ -21,14 +21,14 @@ module Brandish
           # extension.
           #
           # @abstract
-          # @return [::String]
+          # @return [::String, nil]
           def asset_kind_extension
-            ""
+            nil
           end
 
           # The load paths for this asset type.  This defaults to a pathset
           # containing all of the sources, all of the sources' appended with
-          # {#asset_kind_path}, and all of the paths given by the 
+          # {#asset_kind_path}, and all of the paths given by the
           # `:asset_load_paths` option value.
           def asset_load_paths
             return @asset_load_paths if @asset_load_paths
@@ -60,7 +60,8 @@ module Brandish
               (uri.path unless uri.path.empty?),
               (uri.query if uri.query),
               (uri.fragment if uri.fragment)].compact
-            ::Pathname.new(::File.join(*base)).sub_ext(asset_kind_extension)
+            path = ::Pathname.new(::File.join(*base))
+            asset_kind_extension ? path.sub_ext(asset_kind_extension) : path
           end
 
           # The file paths.  This returns a hash with three elements:
@@ -79,7 +80,11 @@ module Brandish
             asset_path = asset_load_paths.resolve(file)
             # The "raw" output path.
             raw_output_path =
-              @pairs.fetch("output") { asset_path.sub_ext(asset_kind_extension) }
+              @pairs.fetch("output") do
+                asset_kind_extension ?
+                  asset_path.sub_ext(asset_kind_extension) :
+                  asset_path
+              end
             # The actual output path of the file.
             file_output_path = output_assets_path / raw_output_path
             src_output_path = file_output_path

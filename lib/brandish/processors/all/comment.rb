@@ -20,7 +20,7 @@ module Brandish
         # Returns nil, removing the node and its children from the tree.
         #
         # @return [nil]
-        def process
+        def perform
           nil
         end
       end

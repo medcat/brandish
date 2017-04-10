@@ -44,6 +44,7 @@ module Brandish
     # @return [self]
     def <<(path)
       @paths << ::Pathname.new(path)
+      self
     end
 
     # Calls {#clear}, and then uses {#<<} to append the given path to the
