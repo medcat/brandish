@@ -21,6 +21,7 @@ module Brandish
         #   this takes the remote styles as an inline style.
         module Vanilla
           Style.engine "file", :command, :style_file
+          Style.engine "link", :command, :style_link
           Style.engine "remote", :command, :style_file_remote
           Style.engine "inline", :block, :style_inline
           Style.engine "remote-file", :command, :style_file_remote
@@ -53,6 +54,10 @@ module Brandish
 
           def style_inline
             @context[:document].add_inline_style(@body.flatten)
+          end
+
+          def style_link
+            @context[:document].add_linked_style(URI(load_asset_file))
           end
 
           def style_file

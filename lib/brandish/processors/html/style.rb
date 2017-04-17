@@ -44,6 +44,9 @@ module Brandish
       #   on the body, and pushes the result as an inline style.
       # - `"remote-inline"` - A command.  Similar to `"remote"`; however,
       #   this takes the remote styles as an inline style.
+      # - `"link"` - A command. Similar to `"remote"`; however, this adds a
+      #   raw link to the file as a style, and so does not add the file to the
+      #   file system.
       #
       # Pairs:
       #
